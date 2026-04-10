@@ -1,2 +1,5 @@
 # LostnFound
-rhdtod lost n found
+
+
+
+supabase 연결하셈
