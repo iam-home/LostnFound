@@ -1,0 +1,22 @@
+{
+  "name": "lostnfound",
+  "version": "1.0.0",
+  "description": "엿머거",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/iam-home/LostnFound.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/iam-home/LostnFound/issues"
+  },
+  "homepage": "https://github.com/iam-home/LostnFound#readme",
+  "dependencies": {
+    "express": "^5.2.1"
+  }
+}
