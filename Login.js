@@ -8,5 +8,5 @@ function signIn() {
 }
 
 function init() {
-    console.log("집가고싶다");
+    console.log("얘가 로그인했는지 안 했는지 체크");
 }
