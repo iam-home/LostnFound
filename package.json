@@ -1,7 +1,7 @@
 {
   "name": "lostnfound",
   "version": "1.0.0",
-  "description": "엿머거",
+  "description": "집가고싶다",
   "main": "main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

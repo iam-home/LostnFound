@@ -1,3 +1,9 @@
+/**
+ * express 쓰면서 만든 건데 express 안 써도 될 거 같음
+ * 혹시 몰라서 일단 방치해두는건데 필요는없어보임
+ */
+
+
 // const express = require('express');
 // const app = express();
 
