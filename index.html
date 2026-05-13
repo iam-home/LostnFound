@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <head>
     <title>Lost & Found</title>
-    <script src="Login.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="./Login.js"></script>
     </script>
 </head>
 <body>
@@ -19,11 +20,10 @@
     -->
     
     <p>로그인하셈</p>
-    <button onclick="signIn()">로그인 버튼</button>
     
-    <script>
-        init();
-    </script>
+    <input type="text" id="sign"/>
+    
+    <button onclick="signInWithEmail()">로그인 버튼</button>
     
 </body>
 </html>
