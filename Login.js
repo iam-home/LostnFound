@@ -3,10 +3,15 @@ const supabaseKey = 'SCRET_REMOVED';
 
 const client = supabase.createClient(supabaseUrl, supabaseKey);
 
-function signIn() {
-    console.log("ㅎ.ㅎ");
-}
+function init() {}
 
-function init() {
-    console.log("얘가 로그인했는지 안 했는지 체크");
-}
+// function signInWithEmail() {
+//     const id = document.querySelector("#sign").value.trim();
+//     // const email // 이메일 본인 인증을 해야되는데
+//     // const password
+// }
+  
+// function signInWithPhoneNumber() {}
+function signInWithGoogle() {}
+function signInWithKakao() {}
+// function signInWithApple() {}
