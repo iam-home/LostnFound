@@ -29,3 +29,46 @@
 분실물 보관
 
 포인트 어쩌고 저거 -> 본인이 본인 물건 잃어버렸다 쓰고 찾아줬대면 어칼거임
+
+
+
+유저 // 회원가입한 유저 저장해야됨
+- user_id
+- email
+- name
+- // is notification enable
+
+게시글
+- id
+- user_id
+- type
+- title
+- body
+- status
+- location
+- category
+- // view_count // 조회수
+- created_at
+
+-------------------
+
+댓글
+- id // 댓글 고유 번호
+- post_id // 게시글 id
+- user_id // 댓글 작성자 id
+- body
+- created_at
+
+키워드 알림 설정
+- id
+- user_id
+- keyword
+
+알림 내역
+- id
+- user_id
+- type
+- message
+- is read
+- link url
+- created_at
