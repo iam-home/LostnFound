@@ -3,33 +3,53 @@ const supabaseKey = 'SCRET_REMOVED';
 
 const client = supabase.createClient(supabaseUrl, supabaseKey);
 
-async function sighOut() {
-    await client.auth.sighOut();
-    checkLogin();
-}
-
 async function checkLogin() {
-    console.log("checkLogin test");
+  try {
+    const { data: { session }, error } = await client.auth.getSession();
 
-    const { data: { session } } = await client.auth.getSession();
+    if (error) throw error;
 
     if (session) { // 로그인함
         return true;
     } else { // 로그인안함
-        return false;
+        if ( confirm("로그인 하시겠습니까?") ) {
+            signInWithGoogle();
+        } else {
+            alert("로그인을 하지 않으면 출입이 불가능합니다.");
+            document.querySelector("#display").style.display = 'none';
+        }
+        }
+
+  } catch (err) {
+    console.error("error:", err.message);
+  }
+}
+
+async function signOut() {
+      const { error } = await client.auth.signOut();
+      if (error) console.error('Logout error:', error.message);
+      else {
+        location.reload();
+      }
     }
-}
 
-function init() {
-    checkLogin();
-}
+async function signInWithGoogle() {
+      const { data, error } = await client.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+      redirectTo: 'http://127.0.0.1:5500/LostnFound/',
+      queryParams: {
+        prompt: 'select_account',
+        access_tpye: 'offline'
+      }
+    }
+      });
 
-function signInWithGoogle() { // google cloud console에 localhost:5500 써놨는데 실제로 열리는 건 로컬호스트 아님. 127 어쩌고 뜨잖음. 그래서 안될 수도 있으니까 알아서 고쳐보셈. 난 머리아파서 더 안 할거임
-    console.log("login func test");
-}
+      if (error) console.error('error:', error.message);
+    }
 
 
-// function signInWithEmail() {}
-// function signInWithKakao() {}
-// function signInWithPhoneNumber() {}
-// function signInWithApple() {}
+// // function signInWithEmail() {}
+// // function signInWithKakao() {}
+// // function signInWithPhoneNumber() {}
+// // function signInWithApple() {}

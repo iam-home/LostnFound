@@ -4,11 +4,66 @@
     <title>Lost & Found</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="./Login.js"></script>
-    </script>
 </head>
 <body>
+    <!-- <button onclick="signOut()">logout</button> -->
+    <div id="display" style="display: none;">
 
-    <button onclick="location.href = './HTML/Login.html';">로그인 페이지로</button>
+<!-- 디폴트 찾은. 찾고 싶은도 같은 페이지에서 필터로 하든 뭐 잘해보셈 -->
 
+<!-- Lost -> 찾고싶은 
+Found -> 찾은 -->
+        <button onclick="changeType('Lost')">찾고싶은</button>
+        <button onclick="changeType('Found')">찾은</button>
+
+        <div id="body"></div>
+
+
+
+    </div>
+    <script>
+
+        let foundBang = 'Found';
+        
+        async function init() {
+            const isLogin = await checkLogin()
+
+            if (isLogin) document.querySelector("#display").style.display = 'block';
+            else if (!isLogin) document.querySelector("#display").style.display = 'none';
+        }
+        
+
+        function changeType(type) {
+            foundBang = type;
+            loadPosts();
+        }
+
+        async function loadPosts() {
+            const { data: posts, error } = await client.from('posts').select('*').eq('type', foundBang).order('created_at', { ascending: false });
+
+        if (error) {
+            console.error(error);
+            return;
+        }
+
+        let tag = "";
+        if (posts.length === 0) {
+        tag = `<div>아직 등록된 글이 없습니다.</div>`;
+      } else {
+        posts.forEach(post => {
+            tag += `
+            <div class="post-card">
+                <h3>${post.title}</h3>
+                <p>${post.body}</p>
+            </div>
+            `
+        });
+    }
+    document.querySelector("#body").innerHTML = tag;
+        }
+
+        loadPosts(); // 디폴트이심
+        init();
+    </script>
 </body>
 </html>
