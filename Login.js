@@ -53,3 +53,23 @@ async function signInWithGoogle() {
 // // function signInWithKakao() {}
 // // function signInWithPhoneNumber() {}
 // // function signInWithApple() {}
+
+
+
+// for test
+async function dever() { // 테스트용 이메일 로그인
+  try {
+    const { data, error } = await client.auth.signInWithPassword({
+    email: 'test@gmail.com',
+    password: 'uiopui'
+  });
+  if (error) {
+    console.error(error);
+    return false;
+  }
+  return true;
+  } catch (e) {
+    console.error(e);
+    return false;
+  }
+}
