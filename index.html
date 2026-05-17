@@ -26,7 +26,8 @@ Found -> 찾은 -->
         let foundBang = 'Found';
         
         async function init() {
-            const isLogin = await checkLogin()
+            // const isLogin = await checkLogin();
+            const isLogin = await dever();
 
             if (isLogin) document.querySelector("#display").style.display = 'block';
             else if (!isLogin) document.querySelector("#display").style.display = 'none';
