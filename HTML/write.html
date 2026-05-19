@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Write |  Lost & Found</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../Login.js"></script>
+</head>
+<body>
+    
+    <div>
+        wrtiePage
+    </div>
+    
+    <input type="text" id="write">
+    <button onclick="insert();">글쓰기</button>
+    
+    
+    
+    
+    <script>
+    
+    async function insert() {
+        const { error } await.client.from("posts").insert([write]); // 맞냐 이거
+        if (!error) {
+            alert("등록됨");
+            window,history.back();
+        } else {
+            console.error(error.message);
+            alert("실패");
+        }
+    }
+    
+    async function init() { // 중간에 로그인 풀 수 있는 방법이 있을까. 있으면 조건문 더 써야돠는디
+        // await signInWithGoogle();
+        await dever();
+    }
+    
+    init();
+    </script>
+</body>
+</html>
