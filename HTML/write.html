@@ -18,12 +18,20 @@
     
     
     <script>
+    let fromSource = null;
     
     async function insert() {
-        const { error } await.client.from("posts").insert([write]); // 맞냐 이거
+        const { error } = await client.from("posts").insert([write]);
+        const body = document.querySelector("#write").value
+        
+        // fromSource써서 어디서 왔는지 if문쓰셈
+        
         if (!error) {
-            alert("등록됨");
-            window,history.back();
+            if (body.trim() === "") alert("내용을 입력해주세요");
+            else {
+                alert("등록됨");
+                window, history.back();
+            }
         } else {
             console.error(error.message);
             alert("실패");
@@ -35,6 +43,11 @@
         await dever();
     }
     
+    document.addEventListener("DOMContentLoaded", async () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        fromSource = urlParams.get('from') || 'found';
+        // init();
+    }
     init();
     </script>
 </body>
