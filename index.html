@@ -20,12 +20,12 @@ Found -> 찾은 -->
 
         <div id="body"></div>
 
-        <button onclick="location.href='./HTML/write.html?from=found'">글쓰기</button>
+        <button onclick="location.href='./HTML/write.html?from=state'">글쓰기</button>
 
     </div>
     <script>
 
-        let foundBang = 'Found';
+        let state = 'Found';
         
         async function init() {
             // const isLogin = await checkLogin();
@@ -37,12 +37,12 @@ Found -> 찾은 -->
         
 
         function changeType(type) {
-            foundBang = type;
+            state = type;
             loadPosts();
         }
 
         async function loadPosts() {
-            const { data: posts, error } = await client.from('posts').select('*').eq('type', foundBang).order('created_at', { ascending: false });
+            const { data: posts, error } = await client.from('posts').select('*').eq('type', state).order('created_at', { ascending: false });
 
         if (error) {
             console.error(error);

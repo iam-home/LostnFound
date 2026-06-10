@@ -45,7 +45,11 @@
     
     document.addEventListener("DOMContentLoaded", async () => {
         const urlParams = new URLSearchParams(window.location.search);
-        fromSource = urlParams.get('from') || 'found';
+        fromSource = urlParams.get('from');
+        
+        if (fromSource === 'Found') {}
+        else if (fromSource === 'Lost') {}
+        
         // init();
     }
     init();
