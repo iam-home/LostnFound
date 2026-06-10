@@ -64,7 +64,7 @@
 - user_id
 - keyword
 
-알림 내역
+알림 내역 // 뭐냐이게 알림 내역이 왜 필요함??
 - id
 - user_id
 - type
