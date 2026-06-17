@@ -7,12 +7,23 @@
 </head>
 <body>
     
+    <header>
     <div>
-        wrtiePage
-    </div>
+        
+      <button onclick="goBack()">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+        <span>취소</span>
+      </button>
+
+      <span id='whatIsThisState'>찾은 이거 뭐라 써야되냐</span>
+      <button onclick="register()">등록 완료</button>
     
-    <input type="text" id="write">
-    <button onclick="insert();">글쓰기</button>
+    </div>
+  </header>
+    
+    <textarea id="title" oninput="autoResize(this)" placeholder="제목 입력"></textarea>
+    <!-- <br /> -->
+    <textarea id="body" oninput="autoResize(this)" placeholder="본문 입력"></textarea>
     
     
     
@@ -20,11 +31,18 @@
     <script>
     let fromSource = null;
     
-    async function insert() {
-        const { error } = await client.from("posts").insert([write]);
-        const body = document.querySelector("#write").value
-        
-        // fromSource써서 어디서 왔는지 if문쓰셈
+    function autoResize(textarea) {
+    textarea.style.height = 'auto';
+    textarea.style.height = textarea.scrollHeight + 'px';
+}
+
+    
+    async function register() {
+        const { error } = await client.from("posts").insert([body]);
+        const title = document.querySelector("#title").value;
+        const body = document.querySelector("#body").value;
+
+        // if문 써라 그 뭐냐 그 칸 잘 채웠나 그거. 아니 근데 위치도 칸 채우게 할거임? 뭐 선택 어쩌고 했잔음
         
         if (!error) {
             if (body.trim() === "") alert("내용을 입력해주세요");
@@ -38,6 +56,12 @@
         }
     }
     
+    function goBack() {
+        if (confirm("작성 중인 내용은 저장되지 않습니다. 나가시겠습니까?")) {
+            window.history.back(); // 이거 찾고싶은에서 글쓰기로 드갔을떄 뒤로 가면 찾은으로 가짐. 고쳐보셈
+        }
+    }
+    
     async function init() { // 중간에 로그인 풀 수 있는 방법이 있을까. 있으면 조건문 더 써야돠는디
         // await signInWithGoogle();
         await dever();
@@ -47,17 +71,26 @@
         const urlParams = new URLSearchParams(window.location.search);
         fromSource = urlParams.get('from');
         
-        // if (fromSource === 'Found') {}
-        // else if (fromSource === 'Lost') {}
         
-        // init();
-    }
+        if (fromSource === 'Found') {
+            찾은();
+        } else if (fromSource === 'Lost') {
+            document.querySelector("#whatIsThisState").innerHTML = "찾고싶은으로_바꾸셈";
+            찾고싶은();
+        }
+        else {
+            console.log("fromSource는", `${fromSource}` + "임 멍청아");
+        }
+        
+        init();
+    });
+
+
+
+    function 찾은() {}
     
-    if (fromSource === 'Found') {}
-    else if (fromSource === 'Lost') {}
+    function 찾고싶은() {}
     
-    
-    init();
     </script>
 </body>
 </html>

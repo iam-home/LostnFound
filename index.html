@@ -11,16 +11,18 @@
 
 <!-- 디폴트 찾은. 찾고 싶은도 같은 페이지에서 필터로 하든 뭐 잘해보셈 -->
 
-<!-- Lost -> 찾고싶은 
-Found -> 찾은 -->
-        <button onclick="changeType('Lost')">찾고싶은</button>
+<!--
+Found -> 찾은
+Lost -> 찾고싶은 
+-->
         <button onclick="changeType('Found')">찾은 (디폴트)</button>
+        <button onclick="changeType('Lost')">찾고싶은</button>
 
         
 
         <div id="body"></div>
 
-        <button onclick="location.href='./HTML/write.html?from=state'">글쓰기</button>
+        <button onclick="location.href=`./HTML/write.html?from=${state}`">글쓰기</button>
 
     </div>
     <script>
