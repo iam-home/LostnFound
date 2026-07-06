@@ -3,6 +3,7 @@
 <head>
     <title>Lost & Found</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/heic2any/0.0.4/heic2any.min.js"></script>
     <script src="./Login.js"></script>
 </head>
 <body>
@@ -23,7 +24,7 @@ Lost -> 찾고싶은
         <div id="body"></div>
 
         <button onclick="location.href=`./HTML/write.html?from=${state}`">글쓰기</button>
-
+    
     </div>
     <script>
 
@@ -58,13 +59,39 @@ Lost -> 찾고싶은
         posts.forEach(post => {
             tag += `
             <div class="post-card">
-                <h3>${post.title}</h3>
-                <p>${post.body}</p>
+                <h3 onclick='fullVer();'>${post.title}</h3> 클릭했을 때 상세보기가 나을거같음. 삭제/수정 버튼도 안에 넣어두면될듯
+                <!-- <p>${post.body}</p> -->
             </div>
             `
         });
     }
     document.querySelector("#body").innerHTML = tag;
+        }
+        
+        async function fullVer() { // 상세보기 만드셈. 사진 업로드했으면 사진도 보이게
+            const { data: posts, error } = await client.from('posts').select('*').eq('type', state).order('created_at', { ascending: false });
+            // document.querySelector("#display").innerHTML = '';
+
+if (error) {
+    console.error(error);
+    return;
+}
+
+let tag = "";
+if (posts.length === 0) {
+    tag = `<div>아직 등록된 글이 없습니다.</div>`;
+} else {
+    posts.forEach(post => {
+        tag += `
+            <div class="post-card">
+                <h3 onclick='fullVer();'>${post.title}</h3>
+                <p>${post.body}</p>
+            </div>
+            `
+    });
+}
+document.querySelector("#display").innerHTML = tag; // body에 안 넣고 디스플레이에 넣으면 되긴 하는데 이거 뭔가 이상한디. 그냥 창이 바뀌는 느낌임 별로임. 하나만 보이는 거도 아니네이거
+            // 상세보기 안에 수정 삭제 넣어
         }
 
         loadPosts(); // 디폴트이심

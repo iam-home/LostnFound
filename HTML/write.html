@@ -3,6 +3,8 @@
 <head>
     <title>Write |  Lost & Found</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/heic2any/0.0.4/heic2any.min.js"></script>
+
     <script src="../Login.js"></script>
 </head>
 <body>
@@ -24,7 +26,10 @@
     <textarea id="title" oninput="autoResize(this)" placeholder="제목 입력"></textarea>
     <br />
     <textarea id="body" oninput="autoResize(this)" placeholder="본문 입력"></textarea>
-    
+    <br />
+    <input type="file" id="fileInput" />
+    <button onclick="uploadFile()">사진 업로드</button>
+    <div id="preview"></div>
     
     
     
@@ -72,9 +77,82 @@
         }
     }
     
+    async function uploadFile() {
+        const fileInput = document.querySelector('#fileInput');
+        if (fileInput.files.length === 0) return;
+
+        let file = fileInput.files[0];
+        
+        // heic2any
+        if (file.name.toLowerCase().endsWith('.heic') || file.name.toLowerCase().endsWith('.heif')) {
+        try {
+            console.log("HEIC 파일이 감지되어 JPG 변환을 시작합니다...");
+            alert("HEIC 이미지를 변환 중입니다. 잠시만 기다려주세요.");
+        
+            const convertedBlob = await heic2any({
+                blob: file,
+                toType: "image/jpeg",
+                quality: 0.8
+            });
+        
+            const newFileName = file.name.replace(/\.heic$/i, '.jpg').replace(/\.heif$/i, '.jpg');
+            file = new File([convertedBlob], newFileName, { type: "image/jpeg" });
+        
+            console.log("JPG 변환 완료!", file);
+        } catch (err) {
+            console.error("HEIC 변환 실패:", err);
+            alert("이미지 변환 중 오류가 발생했습니다. JPG나 PNG 파일로 올려주세요.");
+            return;
+        }
+    }
+        
+        
+        if (fileInput.files.length === 0) {
+            alert("업로드할 파일을 선택해주세요.");
+            return;
+        }
+
+        const fileExtension = file.name.split('.').pop();
+        const fileName = `${Date.now()}_${Math.floor(Math.random() * 1000)}.${fileExtension}`;
+
+        try {
+            console.log("업로드 시작...", fileName);
+
+            const { data, error } = await client.storage
+                .from('upload')
+                .upload(fileName, file, {
+                    cacheControl: '3600',
+                    upsert: false,
+                    contentType: file.type,
+                });
+
+            if (error) throw error;
+
+            console.log("업로드 성공 데이터:", data);
+            alert("파일 업로드 성공!");
+
+            const { data: urlData } = client.storage
+                .from('upload')
+                .getPublicUrl(fileName);
+
+            const publicUrl = urlData.publicUrl;
+            console.log("공개 주소(URL):", publicUrl);
+            document.querySelector('#preview').innerHTML = `<img src="${publicUrl}" width="300" />`;
+
+        } catch (error) {
+            console.error("업로드 실패:", error.message);
+            alert("업로드 실패: " + error.message);
+        }
+    }
+
+    
     function goBack() {
-        if (confirm("작성 중인 내용은 저장되지 않습니다. 나가시겠습니까?")) {
-            window.history.back(); // 이거 찾고싶은에서 글쓰기로 드갔을떄 뒤로 가면 찾은으로 가짐. 뭔가 해보셈
+        if ( document.querySelector("#title").value.trim() !== "" || document.querySelector("#body").value.trim() !== "") {
+            if (confirm("작성 중인 내용은 저장되지 않습니다. 나가시겠습니까?")) {
+                window.history.back(); // 이거 찾고싶은에서 글쓰기로 드갔을떄 뒤로 가면 찾은으로 가짐. 뭔가 해보셈
+            }
+        } else {
+            window.history.back();
         }
     }
     
