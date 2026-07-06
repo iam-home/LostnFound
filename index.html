@@ -5,6 +5,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/heic2any/0.0.4/heic2any.min.js"></script>
     <script src="./Login.js"></script>
+    <link rel="stylesheet" href="./style.css">
 </head>
 <body>
     <!-- <button onclick="signOut()">logout</button> -->
@@ -59,8 +60,7 @@ Lost -> 찾고싶은
         posts.forEach(post => {
             tag += `
             <div class="post-card">
-                <h3 onclick='fullVer();'>${post.title}</h3> 클릭했을 때 상세보기가 나을거같음. 삭제/수정 버튼도 안에 넣어두면될듯
-                <!-- <p>${post.body}</p> -->
+                <h3 onclick="location.href='./HTML/detail.html?id=${post.id}'" style="cursor: pointer;">${post.title}</h3>
             </div>
             `
         });
