@@ -6,11 +6,57 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/heic2any/0.0.4/heic2any.min.js"></script>
     <script src="../Login.js"></script>
     <link rel="stylesheet" href="../style.css">
+    <style>
+        .menu-container {
+            position: relative;
+            display: inline-block;
+            float: right;
+        }
+        .dots-btn {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+        }
+        .dropdown-menu { 
+            display: none;
+            position: absolute;
+            right: 0;
+            background: white;
+            border: 1px solid #ccc;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            z-index: 1;
+        }
+        .dropdown-menu button {
+            white-space: nowrap;
+            display: block; 
+            width: 100%; 
+            padding: 10px 20px; 
+            border: none; 
+            background: none; 
+            cursor: pointer; 
+            text-align: left;
+        }
+        .dropdown-menu button:hover {
+            background: #f5f5f5;
+        }
+        .show {
+            display: block;
+        }
+        
+
+        #postImage {
+            max-width: 100%;
+            height: auto;
+            margin-top: 15px;
+            display: none;
+        }       
+    </style>
 </head>
 <body>
 
-    <button onclick="window.history.back()">⬅️ 목록으로</button>
-    <button onclick='finish();'>찾음완료</button>다른 말이 낫지않을까
+    <button onclick="location.href='../index.html';">목록으로</button>
+    <button onclick='finish();'>찾음완료</button>다른 말이 낫지않을까 아니 근데 왜 찾은 칸에서 찾음완료를 함? 찾고싶은으로 가야되는거아님? 좀 더 생각해봐이거 지금 확실히 좀 이상함
 
     <div class="menu-container">
         <button class="dots-btn" onclick="toggleMenu()">⋮</button>
@@ -21,7 +67,7 @@
     </div>
 
     <div id="postDetail">
-        <h1 id="postTitle">로딩 중...</h1>
+        <h1 id="postTitle">로딩 중...</h1> <!--이거 좀 별로지않냐-->
         <hr>
         <p id="postBody"></p>
         <img id="postImage" src="" alt="첨부 이미지">
@@ -52,7 +98,6 @@
                 if (error) throw error;
                 
                 currentPost = data;
-
                 document.querySelector("#postTitle").innerText = data.title;
                 document.querySelector("#postBody").innerText = data.body;
 
@@ -89,7 +134,7 @@
 
             try {
                 if (currentPost && currentPost.image_url) {
-                    const fileName = currentPost.image_url.split('/').pop(); // 여기가 사진 보여주는부분임? 사진 안보임.
+                    const fileName = currentPost.image_url.split('/').pop();
                     await client.storage.from('upload').remove([fileName]);
                 }
 
