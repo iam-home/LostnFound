@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Edit | Lost & Found</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/heic2any/0.0.4/heic2any.min.js"></script>
+    <script src="../Login.js"></script>
+    <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+    
+    <textarea id="title" oninput="autoResize(this)" placeholder="수정할 제목을 입력하세요"></textarea>
+    <textarea id="body" oninput="autoResize(this)" placeholder="수정할 내용을 입력하세요"></textarea>
+    <button onclick='EDIT();'>수정 완료</button>
+    
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const editId = urlParams.get('id');
+        
+        const titleInput = document.querySelector("#title");
+        const bodyInput = document.querySelector("#body");
+        
+        document.addEventListener("BOMContentLoaded", async () => {
+            if (!editId) {
+                alert("잘못된 접근입니다.");
+                window.history.back();
+                return;
+            }
+            await loadOriginalPost();
+        });
+        
+        async function loadOriginalPost() {
+            try {
+                const { data, error } = await client
+                .from("posts")
+                .select("title, body")
+                .eq('id', editId)
+                .single();
+                
+            if (error) throw error;
+            
+            titleInput.value = date.title;
+            bodyInput.value = data.body;
+            
+            autoResize(titleInput);
+            autoResize(bodyInput);
+            } catch (err) {
+                console.error("글 로딩 실패:", err.message);
+                alert("글 데이터를 불러오지 못했습니다.");
+            }
+        }
+        
+        function autoResize(textarea) {
+            textarea.style.height = 'auto';
+            textarea.style.height = textarea.scrollHeight + 'px';
+        }
+        
+        async function EDIT() {
+            const updatedTitle = titleInput.value.trim();
+            const updatedBody = bodyInput.value.trim();
+            
+            // 빈칸 검사를 해야될까 빈칸으로 완료누르면 그냥 기존 글 유지하게 하고싶은데. 아니 뭐 기존글로 유지한다고 안내 정도만 띄우든가
+            // if (!updatedTitle || !updatedBody) {
+            //     alert("제목과 내용을 모두 입력해 주세요.");
+            //     return;
+            // }
+            // 지금은 수정 비워두면 그냥 값이 없어짐. 기존값은 유지되게 뭔가 해보셈.
+            
+            try {
+                const { error } = await client
+                .from("posts")
+                .update({ // 여길 만져야되지 않을까. 이전 값이랑 if문에 넣어서 비교하면 뭔가 될거같은디
+                    title: updatedTitle,
+                    body: updatedBody,
+                })
+                .eq('id', editId);
+            
+            if (error) throw error;
+            
+            alert("수정되었습니다.");
+            
+            // location.href = `./datail.html?id=${editId}`;
+            window.history.back(); // 얘보다는 위가 낫다고 함
+            } catch (err) {
+                console.error("수정 실패:", err.message);
+                alert("수정 실패: " + err.message)
+            }
+        }
+    </script>
+</body>
+</html>

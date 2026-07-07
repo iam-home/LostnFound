@@ -68,31 +68,6 @@ Lost -> 찾고싶은
     document.querySelector("#body").innerHTML = tag;
         }
         
-        async function fullVer() { // 상세보기 만드셈. 사진 업로드했으면 사진도 보이게
-            const { data: posts, error } = await client.from('posts').select('*').eq('type', state).order('created_at', { ascending: false });
-            // document.querySelector("#display").innerHTML = '';
-
-if (error) {
-    console.error(error);
-    return;
-}
-
-let tag = "";
-if (posts.length === 0) {
-    tag = `<div>아직 등록된 글이 없습니다.</div>`;
-} else {
-    posts.forEach(post => {
-        tag += `
-            <div class="post-card">
-                <h3 onclick='fullVer();'>${post.title}</h3>
-                <p>${post.body}</p>
-            </div>
-            `
-    });
-}
-document.querySelector("#display").innerHTML = tag; // body에 안 넣고 디스플레이에 넣으면 되긴 하는데 이거 뭔가 이상한디. 그냥 창이 바뀌는 느낌임 별로임. 하나만 보이는 거도 아니네이거
-            // 상세보기 안에 수정 삭제 넣어
-        }
 
         loadPosts(); // 디폴트이심
         init();
