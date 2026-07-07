@@ -22,7 +22,7 @@
         const titleInput = document.querySelector("#title");
         const bodyInput = document.querySelector("#body");
         
-        document.addEventListener("BOMContentLoaded", async () => {
+        document.addEventListener("DOMContentLoaded", async () => {
             if (!editId) {
                 alert("잘못된 접근입니다.");
                 window.history.back();
@@ -33,15 +33,23 @@
         
         async function loadOriginalPost() {
             try {
+                const { data: { user } } = await client.auth.getUser();
                 const { data, error } = await client
                 .from("posts")
-                .select("title, body")
+                .select("title, body, user_id")
                 .eq('id', editId)
                 .single();
                 
             if (error) throw error;
+
+            if (data.user_id !== user.id) {
+                    alert("본인이 작성한 글만 수정할 수 있습니다.");
+                    console.log("멍청아");
+                    window.history.back();
+                    return;
+                }
             
-            titleInput.value = date.title;
+            titleInput.value = data.title;
             bodyInput.value = data.body;
             
             autoResize(titleInput);
@@ -57,35 +65,38 @@
             textarea.style.height = textarea.scrollHeight + 'px';
         }
         
-        async function EDIT() {
+        async function EDIT() { // 사진도 수정할 수 있게
             const updatedTitle = titleInput.value.trim();
             const updatedBody = bodyInput.value.trim();
-            
-            // 빈칸 검사를 해야될까 빈칸으로 완료누르면 그냥 기존 글 유지하게 하고싶은데. 아니 뭐 기존글로 유지한다고 안내 정도만 띄우든가
-            // if (!updatedTitle || !updatedBody) {
-            //     alert("제목과 내용을 모두 입력해 주세요.");
-            //     return;
-            // }
-            // 지금은 수정 비워두면 그냥 값이 없어짐. 기존값은 유지되게 뭔가 해보셈.
-            
+            const updateData = {};
+
+            if (updatedTitle !== "") {
+                updateData.title = updatedTitle;
+            }
+    
+            if (updatedBody !== "") {
+                updateData.body = updatedBody;
+            }
+
+            if (Object.keys(updateData).length === 0) { // 이거 필요함?
+                alert("수정된 내용이 없습니다!");
+                return;
+            }
+
             try {
                 const { error } = await client
-                .from("posts")
-                .update({ // 여길 만져야되지 않을까. 이전 값이랑 if문에 넣어서 비교하면 뭔가 될거같은디
-                    title: updatedTitle,
-                    body: updatedBody,
-                })
-                .eq('id', editId);
+                    .from("posts")
+                    .update(updateData)
+                    .eq('id', editId);
+
+                if (error) throw error;
+
+                alert("수정되었습니다!");
+                location.href = `./detail.html?id=${editId}`;
             
-            if (error) throw error;
-            
-            alert("수정되었습니다.");
-            
-            // location.href = `./datail.html?id=${editId}`;
-            window.history.back(); // 얘보다는 위가 낫다고 함
             } catch (err) {
                 console.error("수정 실패:", err.message);
-                alert("수정 실패: " + err.message)
+                alert("수정 실패: " + err.message);
             }
         }
     </script>

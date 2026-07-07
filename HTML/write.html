@@ -28,7 +28,7 @@
     <textarea id="body" oninput="autoResize(this)" placeholder="본문 입력"></textarea>
     <br />
     <input type="file" id="fileInput" />
-    <button onclick="uploadFile()">사진 업로드</button>
+    <button onclick="uploadFile()">사진 업로드 // 이거 굳이 버튼 한 번 더 누르게 하지말고 그냥 사진올리면 바로바로 업로드되게 하는게 편하지않음?</button>
     <div id="preview"></div>
     
     
@@ -41,41 +41,67 @@
     textarea.style.height = textarea.scrollHeight + 'px';
 }
 
-    
     async function register() {
-        const title = document.querySelector("#title").value;
-        const body = document.querySelector("#body").value;
+    const title = document.querySelector("#title").value;
+    const body = document.querySelector("#body").value;
+    const fileInput = document.querySelector("#fileInput");
 
-        if (title.trim() === "") {
-            alert("제목을 입력해주세요.");
-            return;
-        }
+    if (title.trim() === "") {
+        alert("제목을 입력해주세요.");
+        return;
+    }
 
-        if (body.trim() === "") {
-            alert("내용을 입력해주세요.");
-            return;
+    if (body.trim() === "") {
+        alert("내용을 입력해주세요.");
+        return;
+    }
+
+    try {
+        let finalImageUrl = null;
+
+        if (fileInput && fileInput.files.length > 0) {
+            const file = fileInput.files[0];
+            const fileExtension = file.name.split('.').pop(); 
+            const fileName = `${Date.now()}.${fileExtension}`; 
+            const { data: storageData, error: storageError } = await client
+                .storage
+                .from('upload') 
+                .upload(fileName, file);
+
+            if (storageError) {
+                throw new Error("스토리지 업로드 실패: " + storageError.message);
+            }
+
+            const { data: urlData } = client
+                .storage
+                .from('upload')
+                .getPublicUrl(fileName);
+
+            finalImageUrl = urlData.publicUrl;
         }
 
         const { error } = await client.from("posts").insert([{
             title: title,
             body: body,
             type: fromSource,
+            image_url: finalImageUrl
             // state?
             // location
             // category
-    }]);
+        }]);
 
-        if (!error) {
-            if (body.trim() === "") alert("내용을 입력해주세요");
-            else {
-                alert("등록됨");
-                window.history.back();
-            }
-        } else {
-            console.error(error.message);
-            alert("실패");
+        if (error) {
+            throw new Error("데이터베이스 저장 실패: " + error.message);
         }
+
+        alert("등록됨");
+        window.history.back();
+
+    } catch (err) {
+        console.error(err.message);
+        alert(err.message);
     }
+}
     
     async function uploadFile() {
         const fileInput = document.querySelector('#fileInput');
@@ -98,7 +124,7 @@
             const newFileName = file.name.replace(/\.heic$/i, '.jpg').replace(/\.heif$/i, '.jpg');
             file = new File([convertedBlob], newFileName, { type: "image/jpeg" });
         
-            console.log("JPG 변환 완료!", file);
+            console.log("JPG 변환 완료", file);
         } catch (err) {
             console.error("HEIC 변환 실패:", err);
             alert("이미지 변환 중 오류가 발생했습니다. JPG나 PNG 파일로 올려주세요.");
