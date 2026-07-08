@@ -55,7 +55,8 @@
 </head>
 <body>
 
-    <button onclick="location.href='../index.html';">목록으로</button>
+    <button onclick="goBack();">목록으로</button>
+    <!-- 여기는 뒤로 가는 게 나을까 홈으로 보내는 게 나을까 -->
     <button onclick='finish();'>찾음완료</button>다른 말이 낫지않을까 아니 근데 왜 찾은 칸에서 찾음완료를 함? 찾고싶은으로 가야되는거아님? 좀 더 생각해봐이거 지금 확실히 좀 이상함
 
     <div class="menu-container">
@@ -81,11 +82,21 @@
         document.addEventListener("DOMContentLoaded", async () => {
             if (!postId) {
                 alert("잘못된 접근입니다.");
-                window.history.back();
+                location.replace(`../index.html`);
                 return;
             }
             await loadPostDetail();
         });
+
+        function goBack() {
+            const referrer = document.referrer;
+
+            if (referrer.includes("edit.html")) {
+                location.href = "../index.html"; 
+            } else {
+                window.history.back();
+            }
+        }
 
         async function loadPostDetail() {
             try {
