@@ -13,6 +13,7 @@
     
     <textarea id="title" oninput="autoResize(this)" placeholder="수정할 제목을 입력하세요"></textarea>
     <textarea id="body" oninput="autoResize(this)" placeholder="수정할 내용을 입력하세요"></textarea>
+    <input type="file" id="fileInput">
     <button onclick='EDIT();'>수정 완료</button>
     
     <script>
@@ -25,7 +26,7 @@
         document.addEventListener("DOMContentLoaded", async () => {
             if (!editId) {
                 alert("잘못된 접근입니다.");
-                window.history.back();
+                location.replace(`../index.html`);
                 return;
             }
             await loadOriginalPost();
@@ -65,40 +66,57 @@
             textarea.style.height = textarea.scrollHeight + 'px';
         }
         
-        async function EDIT() { // 사진도 수정할 수 있게
-            const updatedTitle = titleInput.value.trim();
-            const updatedBody = bodyInput.value.trim();
-            const updateData = {};
+        async function EDIT() { // 있던 사진 없애는 거도 하셈. 뒤로 가는 것들 제대로들 됐는지 확인하셈
+    const updatedTitle = titleInput.value.trim();
+    const updatedBody = bodyInput.value.trim();
+    const fileInput = document.querySelector("#fileInput");
 
-            if (updatedTitle !== "") {
-                updateData.title = updatedTitle;
-            }
-    
-            if (updatedBody !== "") {
-                updateData.body = updatedBody;
-            }
+    if (!updatedTitle || !updatedBody) {
+        alert("제목과 내용을 모두 입력해 주세요.");
+        return;
+    }
 
-            if (Object.keys(updateData).length === 0) { // 이거 필요함?
-                alert("수정된 내용이 없습니다!");
-                return;
-            }
+    try {
+        const updateData = {
+            title: updatedTitle,
+            body: updatedBody
+        };
 
-            try {
-                const { error } = await client
-                    .from("posts")
-                    .update(updateData)
-                    .eq('id', editId);
+        if (fileInput && fileInput.files.length > 0) {
+            const file = fileInput.files[0];
+            const fileExtension = file.name.split('.').pop(); 
+            const fileName = `${Date.now()}.${fileExtension}`;
 
-                if (error) throw error;
+            const { data: storageData, error: storageError } = await client
+                .storage
+                .from('upload')
+                .upload(fileName, file);
 
-                alert("수정되었습니다!");
-                location.href = `./detail.html?id=${editId}`;
-            
-            } catch (err) {
-                console.error("수정 실패:", err.message);
-                alert("수정 실패: " + err.message);
-            }
+            if (storageError) throw new Error("사진 업로드 실패: " + storageError.message);
+
+            const { data: urlData } = client
+                .storage
+                .from('upload')
+                .getPublicUrl(fileName);
+
+            updateData.image_url = urlData.publicUrl; 
         }
+
+        const { error } = await client
+            .from("posts")
+            .update(updateData)
+            .eq('id', editId);
+
+        if (error) throw error;
+
+        alert("수정되었습니다!");
+        location.replace(`./detail.html?id=${editId}`);
+    
+    } catch (err) {
+        console.error("수정 실패:", err.message);
+        alert("수정 실패: " + err.message);
+    }
+}
     </script>
 </body>
 </html>
