@@ -4,6 +4,7 @@
     <title>Write |  Lost & Found</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/heic2any/0.0.4/heic2any.min.js"></script>
+
     <script src="../Login.js"></script>
     <link rel="stylesheet" href="../style.css">
 </head>
@@ -18,7 +19,7 @@
       </button>
 
       <span id='whatIsThisState'>찾은 이거 뭐라 써야되냐</span>
-      <button onclick="register()">등록 완료</button>
+      <button onclick="handleRegister();">등록 완료</button>
     
     </div>
   </header>
@@ -27,11 +28,14 @@
     <br />
     <textarea id="body" oninput="autoResize(this)" placeholder="본문 입력"></textarea>
     <br />
+    <h1>위치 정보는 직접 입력보다는 선택하는게 낫겠지 // 선택 필수, 추가 설명</h1>
+    <br />
     <input type="file" id="fileInput" />
-    <button onclick="uploadFile()">사진 업로드 // 이거 굳이 버튼 한 번 더 누르게 하지말고 그냥 사진올리면 바로바로 업로드되게 하는게 편하지않음?</button>
+    <h5>※ 사진이 있으면 분실자가 물건을 찾을 확률이 크게 높아집니다.</h5>
     <div id="preview"></div>
     
     
+
     
     <script>
     let fromSource = null;
@@ -39,137 +43,76 @@
     function autoResize(textarea) {
     textarea.style.height = 'auto';
     textarea.style.height = textarea.scrollHeight + 'px';
-}
-
-    async function register() {
-    const title = document.querySelector("#title").value;
-    const body = document.querySelector("#body").value;
-    const fileInput = document.querySelector("#fileInput");
-
-    if (title.trim() === "") {
-        alert("제목을 입력해주세요.");
-        return;
     }
 
-    if (body.trim() === "") {
-        alert("내용을 입력해주세요.");
-        return;
-    }
-
-    try {
-        let finalImageUrl = null;
-
-        if (fileInput && fileInput.files.length > 0) {
-            const file = fileInput.files[0];
-            const fileExtension = file.name.split('.').pop(); 
-            const fileName = `${Date.now()}.${fileExtension}`; 
-            const { data: storageData, error: storageError } = await client
-                .storage
-                .from('upload') 
-                .upload(fileName, file);
-
-            if (storageError) {
-                throw new Error("스토리지 업로드 실패: " + storageError.message);
-            }
-
-            const { data: urlData } = client
-                .storage
-                .from('upload')
-                .getPublicUrl(fileName);
-
-            finalImageUrl = urlData.publicUrl;
-        }
-
-        const { error } = await client.from("posts").insert([{
-            title: title,
-            body: body,
-            type: fromSource,
-            image_url: finalImageUrl
-            // state?
-            // location
-            // category
-        }]);
-
-        if (error) {
-            throw new Error("데이터베이스 저장 실패: " + error.message);
-        }
-
-        alert("등록됨");
-        window.history.back();
-
-    } catch (err) {
-        console.error(err.message);
-        alert(err.message);
-    }
-}
+    async function handleRegister() {
+        const title = document.querySelector("#title").value.trim();
+        const body = document.querySelector("#body").value.trim();
+        const fileInput = document.querySelector("#fileInput");
     
-    async function uploadFile() {
-        const fileInput = document.querySelector('#fileInput');
-        if (fileInput.files.length === 0) return;
-
-        let file = fileInput.files[0];
-        
-        // heic2any
-        if (file.name.toLowerCase().endsWith('.heic') || file.name.toLowerCase().endsWith('.heif')) {
-        try {
-            console.log("HEIC 파일이 감지되어 JPG 변환을 시작합니다...");
-            alert("HEIC 이미지를 변환 중입니다. 잠시만 기다려주세요.");
-        
-            const convertedBlob = await heic2any({
-                blob: file,
-                toType: "image/jpeg",
-                quality: 0.8
-            });
-        
-            const newFileName = file.name.replace(/\.heic$/i, '.jpg').replace(/\.heif$/i, '.jpg');
-            file = new File([convertedBlob], newFileName, { type: "image/jpeg" });
-        
-            console.log("JPG 변환 완료", file);
-        } catch (err) {
-            console.error("HEIC 변환 실패:", err);
-            alert("이미지 변환 중 오류가 발생했습니다. JPG나 PNG 파일로 올려주세요.");
+        if (!title || !body) {
+            alert("제목과 내용을 입력해 주세요.");
             return;
         }
-    }
         
-        
-        if (fileInput.files.length === 0) {
-            alert("업로드할 파일을 선택해주세요.");
-            return;
-        }
-
-        const fileExtension = file.name.split('.').pop();
-        const fileName = `${Date.now()}_${Math.floor(Math.random() * 1000)}.${fileExtension}`;
-
         try {
-            console.log("업로드 시작...", fileName);
-
-            const { data, error } = await client.storage
-                .from('upload')
-                .upload(fileName, file, {
-                    cacheControl: '3600',
-                    upsert: false,
-                    contentType: file.type,
+            let uploadedImageUrl = null;
+    
+            if (fileInput && fileInput.files.length > 0) {
+                let file = fileInput.files[0];
+                const fileExtension = file.name.split('.').pop().toLowerCase();
+    
+                if (fileExtension === 'heic') {
+                    alert("JPEG 변환을 시작합니다...");
+                    
+                        const convertedBlob = await heic2any({
+                        blob: file,
+                        toType: "image/jpeg",
+                        quality: 0.8
+                    });
+                    
+                file = new File([convertedBlob], file.name.replace(/\.heic$/i, '.jpg'), {
+                    type: "image/jpeg"
                 });
-
-            if (error) throw error;
-
-            console.log("업로드 성공 데이터:", data);
-            alert("파일 업로드 성공");
-
-            const { data: urlData } = client.storage
-                .from('upload')
-                .getPublicUrl(fileName);
-
-            const publicUrl = urlData.publicUrl;
-            console.log("공개 주소(URL):", publicUrl);
-            document.querySelector('#preview').innerHTML = `<img src="${publicUrl}" width="300" />`;
-
-        } catch (error) {
-            console.error("업로드 실패:", error.message);
-            alert("업로드 실패: " + error.message);
+                    
+                    console.log("JPEG 변환 완료");
+                }
+    
+                const fileName = `${Date.now()}_${file.name}`;
+                
+                const { data: storageData, error: storageError } = await client
+                    .storage
+                    .from('upload')
+                    .upload(fileName, file);
+    
+                if (storageError) throw new Error("사진 서버 업로드 실패: " + storageError.message);
+    
+                const { data: urlData } = client.storage.from('upload').getPublicUrl(fileName);
+                uploadedImageUrl = urlData.publicUrl; 
+            }
+        
+            const { error: dbError } = await client
+                .from("posts")
+                .insert([
+                    {
+                        title: title,
+                        body: body,
+                        type: fromSource,
+                        image_url: uploadedImageUrl,
+                    }
+                ]);
+    
+            if (dbError) throw dbError;
+    
+            alert("게시글이 등록되었습니다.");
+            location.replace("../index.html");
+    
+        } catch (err) {
+            console.error("등록 과정 오류 발생:", err.message);
+            alert("등록 실패: " + err.message);
         }
     }
+
 
     
     function goBack() {

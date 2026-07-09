@@ -139,31 +139,54 @@
                 }
             }
         }
-
+        
         async function deletePost() {
-            if (!confirm("정말로 이 게시글을 삭제하시겠습니까?")) return;
+    if (!confirm("정말 이 게시글을 삭제하시겠습니까?")) {
+        return;
+    }
 
-            try {
-                if (currentPost && currentPost.image_url) {
-                    const fileName = currentPost.image_url.split('/').pop();
-                    await client.storage.from('upload').remove([fileName]);
-                }
+    try {
+        const { data: postData, error: fetchError } = await client
+            .from("posts")
+            .select("image_url")
+            .eq("id", postId)
+            .single();
 
-                const { error } = await client
-                    .from("posts")
-                    .delete()
-                    .eq("id", postId);
+        if (fetchError) throw fetchError;
 
-                if (error) throw error;
+        if (postData && postData.image_url) {
+            const fileName = postData.image_url.split('/').pop();
 
-                alert("삭제되었습니다.");
-                location.href = "../index.html";
+            console.log("스토리지에서 지울 파일명:", fileName);
 
-            } catch (err) {
-                console.error("삭제 실패:", err.message);
-                alert("삭제에 실패했습니다: " + err.message);
+            const { error: storageError } = await client
+                .storage
+                .from('upload')
+                .remove([fileName]);
+
+            if (storageError) {
+                console.error("스토리지 사진 삭제 실패:", storageError.message);
+            } else {
+                console.log("스토리지 파일 삭제 완수");
             }
         }
+
+        const { error: dbError } = await client
+            .from("posts")
+            .delete()
+            .eq("id", postId);
+
+        if (dbError) throw dbError;
+
+        alert("게시글이 삭제되었습니다.");
+        location.replace('../index.html')
+
+    } catch (err) {
+        console.error("삭제 처리 중 오류 발생:", err.message);
+        alert("삭제에 실패했습니다: " + err.message);
+    }
+}
+
         
         function finish() {
             console.log("찾음완료로 전환하고, 글 삭제하거나 말거나 수파베이스 스토리지에 사진지우고")
