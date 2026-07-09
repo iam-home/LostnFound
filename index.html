@@ -15,22 +15,27 @@
 
 <!--
 Found -> 찾은
-Lost -> 찾고싶은 
+Lost -> 찾고싶은
 -->
         <button onclick="changeType('Found')">찾은 (디폴트)</button>
         <button onclick="changeType('Lost')">찾고싶은</button>
 
-        
+        <div class="search-container" style="position: relative; display: inline-block;">
+            <input type="text" id="searchKeyword" placeholder="분실물을 검색해 보세요!" onkeyup="if(window.event.keyCode==13){searchPosts()}">
+            <button type="button" id="clearSearchBtn" onclick="clearSearch()" style="display: none; margin-left: -25px; background: none; border: none; cursor: pointer;">X</button>
+
+            <button onclick="searchPosts()">검색</button>
+        </div>
 
         <div id="body"></div>
 
         <button onclick="location.href=`./HTML/write.html?from=${state}`">글쓰기</button>
-    
+
     </div>
     <script>
 
         let state = 'Found';
-        
+
         async function init() {
             // const isLogin = await checkLogin();
             const isLogin = await dever();
@@ -38,8 +43,8 @@ Lost -> 찾고싶은
             if (isLogin) document.querySelector("#display").style.display = 'block';
             else if (!isLogin) document.querySelector("#display").style.display = 'none';
         }
-        
-    
+
+
         function changeType(type) {
             state = type;
             loadPosts();
@@ -67,7 +72,65 @@ Lost -> 찾고싶은
     }
     document.querySelector("#body").innerHTML = tag;
         }
-                
+
+        async function searchPosts() {
+            const keyword = document.querySelector("#searchKeyword").value.trim();
+
+            if (keyword === "") { // 1. 다 지우고 검색 누르기
+              loadPosts();
+              return;
+            }
+
+            try {
+                const { data, error } = await client
+                    .from("posts")
+                    .select("*")
+                    .or(`title.ilike.%${keyword}%,body.ilike.%${keyword}%`)
+                    .order("created_at", { ascending: false });
+
+                document.querySelector("#clearSearchBtn").style.display = "inline-block"; // 2. X버튼으로 검색창 비우기
+
+                if (error) throw error;
+
+                renderSearchResults(data);
+
+            } catch (err) {
+                console.error("검색 실패:", err.message);
+            }
+        } // 3. 로고 클릭으로 홈으로 가기
+
+        function renderSearchResults(posts) {
+            const listContainer = document.querySelector("#body");
+            listContainer.innerHTML = "";
+
+            if (posts.length === 0) {
+                listContainer.innerHTML = "<p>검색 결과가 없습니다.</p>";
+                return;
+            }
+
+            posts.forEach(post => {
+                const isFoundType = post.type === "Found";
+                const tagText = isFoundType ? "찾은" : "찾고싶은";
+                const tagClass = isFoundType ? "Found" : "Lost";
+
+                const postHtml = `
+                    <div class="post-item" onclick="location.href='./HTML/detail.html?id=${post.id}'">
+                        <span class="badge ${tagClass}">${tagText}</span>
+                        <strong class="post-title">${post.title}</strong>
+                        <span class="post-date">${new Date(post.created_at).toLocaleDateString()}</span>
+                    </div>
+                `;
+                listContainer.innerHTML += postHtml;
+            });
+        }
+
+        function clearSearch() {
+            const searchInput = document.querySelector("#searchKeyword");
+            searchInput.value = "";
+
+            document.querySelector("#clearSearchBtn").style.display = "none";
+            loadPosts();
+        }
 
         loadPosts(); // 디폴트이심
         init();
