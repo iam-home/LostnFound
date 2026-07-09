@@ -13,8 +13,18 @@
     
     <textarea id="title" oninput="autoResize(this)" placeholder="수정할 제목을 입력하세요"></textarea>
     <textarea id="body" oninput="autoResize(this)" placeholder="수정할 내용을 입력하세요"></textarea>
+    
+    <div id="imageArea">
+        <img id="postImage" src="" alt="기존 이미지" style="max-width: 100%; height: auto; display: none;">
+        <button type="button" id="deleteImgBtn" onclick="deleteExistingImage()" style="display: none;">사진 삭제</button>
+    </div>
+    
     <input type="file" id="fileInput">
+    <!--onchange="previewNewImage(this)"-->
+    
     <button onclick='EDIT();'>수정 완료</button>
+    
+    
     
     <script>
         const urlParams = new URLSearchParams(window.location.search);
@@ -22,6 +32,9 @@
         
         const titleInput = document.querySelector("#title");
         const bodyInput = document.querySelector("#body");
+        
+        let isImageDeleted = false;
+        let originalImageName = null;
         
         document.addEventListener("DOMContentLoaded", async () => {
             if (!editId) {
@@ -34,30 +47,41 @@
         
         async function loadOriginalPost() {
             try {
-                const { data: { user } } = await client.auth.getUser();
                 const { data, error } = await client
-                .from("posts")
-                .select("title, body, user_id")
-                .eq('id', editId)
-                .single();
+                    .from("posts")
+                    .select("title, body, image_url")
+                    .eq('id', editId)
+                    .single();
                 
-            if (error) throw error;
-
-            if (data.user_id !== user.id) {
-                    alert("본인이 작성한 글만 수정할 수 있습니다.");
-                    console.log("멍청아");
-                    window.history.back();
-                    return;
+                if (error) throw error;
+                
+                titleInput.value = data.title;
+                bodyInput.value = data.body;
+                
+                if (data.image_url) {
+                    const imgTag = document.querySelector("#postImage");
+                    const delBtn = document.querySelector("#deleteImgBtn");
+                    
+                    imgTag.src = data.image_url;
+                    imgTag.style.display = "block";
+                    delBtn.style.display = "inline-block";
+                    originalImageName = data.image_url.split('/').pop();
                 }
-            
-            titleInput.value = data.title;
-            bodyInput.value = data.body;
-            
-            autoResize(titleInput);
-            autoResize(bodyInput);
+                
+                autoResize(titleInput);
+                autoResize(bodyInput);
             } catch (err) {
-                console.error("글 로딩 실패:", err.message);
-                alert("글 데이터를 불러오지 못했습니다.");
+                console.error(err.message);
+            }
+        }
+        
+        function deleteExistingImage() {
+            if (confirm("이 사진을 삭제하시겠습니까?")) {
+                isImageDeleted = true;
+                
+                document.querySelector("#postImage").style.display = "none";
+                document.querySelector("#deleteImgBtn").style.display = "none";
+                document.querySelector("#fileInput").value = "";
             }
         }
         
@@ -66,57 +90,80 @@
             textarea.style.height = textarea.scrollHeight + 'px';
         }
         
-        async function EDIT() { // 있던 사진 없애는 거도 하셈. 뒤로 가는 것들 제대로들 됐는지 확인하셈
-    const updatedTitle = titleInput.value.trim();
-    const updatedBody = bodyInput.value.trim();
-    const fileInput = document.querySelector("#fileInput");
-
-    if (!updatedTitle || !updatedBody) {
-        alert("제목과 내용을 모두 입력해 주세요.");
-        return;
-    }
-
-    try {
-        const updateData = {
-            title: updatedTitle,
-            body: updatedBody
-        };
-
-        if (fileInput && fileInput.files.length > 0) {
-            const file = fileInput.files[0];
-            const fileExtension = file.name.split('.').pop(); 
-            const fileName = `${Date.now()}.${fileExtension}`;
-
-            const { data: storageData, error: storageError } = await client
-                .storage
-                .from('upload')
-                .upload(fileName, file);
-
-            if (storageError) throw new Error("사진 업로드 실패: " + storageError.message);
-
-            const { data: urlData } = client
-                .storage
-                .from('upload')
-                .getPublicUrl(fileName);
-
-            updateData.image_url = urlData.publicUrl; 
+        async function EDIT() {
+            const updatedTitle = titleInput.value.trim();
+            const updatedBody = bodyInput.value.trim();
+            const fileInput = document.querySelector("#fileInput");
+        
+            if (!updatedTitle || !updatedBody) {
+                alert("제목과 내용을 모두 입력해 주세요.");
+                return;
+            }
+        
+            try {
+                const updateData = {
+                    title: updatedTitle,
+                    body: updatedBody
+                };
+                
+                
+                if (fileInput && fileInput.files.length > 0) {
+                    if (originalImageName) {
+                        await client.storage.from('upload').remove([originalImageName]);
+                    }
+        
+                    let file = fileInput.files[0];
+                    const fileExtension = file.name.split('.').pop().toLowerCase();
+                    if (fileExtension === 'heic') {
+                        alert("JPEG 변환을 시작합니다...");
+                        
+                        const convertedBlob = await heic2any({
+                            blob: file,
+                            toType: "image/jpeg",
+                            quality: 0.8
+                        });
+                        
+                        file = new File([convertedBlob], file.name.replace(/\.heic$/i, '.jpg'), {
+                            type: "image/jpeg"
+                        });
+                        
+                        console.log("JPEG 변환 완료");
+                    }
+        
+                    const fileName = `${Date.now()}.${fileExtension}`; 
+        
+                    const { error: storageError } = await client.storage.from('upload').upload(fileName, file);
+                    if (storageError) throw new Error("새 사진 업로드 실패: " + storageError.message);
+        
+                    const { data: urlData } = client.storage.from('upload').getPublicUrl(fileName);
+                    
+                    updateData.image_url = urlData.publicUrl; 
+        
+                } 
+                
+                else if (isImageDeleted && originalImageName) {
+                    const { error: removeError } = await client.storage.from('upload').remove([originalImageName]);
+                    if (removeError) console.error("기존 스토리지 파일 삭제 실패:", removeError.message);
+                    updateData.image_url = null; 
+                }
+        
+        
+                const { error } = await client
+                    .from("posts")
+                    .update(updateData)
+                    .eq('id', editId);
+        
+                if (error) throw error;
+        
+                alert("수정되었습니다.");
+                location.replace(`./detail.html?id=${editId}`); 
+            
+            } catch (err) {
+                console.error("수정 실패:", err.message);
+                alert("수정 실패: " + err.message);
+            }
         }
 
-        const { error } = await client
-            .from("posts")
-            .update(updateData)
-            .eq('id', editId);
-
-        if (error) throw error;
-
-        alert("수정되었습니다!");
-        location.replace(`./detail.html?id=${editId}`);
-    
-    } catch (err) {
-        console.error("수정 실패:", err.message);
-        alert("수정 실패: " + err.message);
-    }
-}
     </script>
 </body>
 </html>
