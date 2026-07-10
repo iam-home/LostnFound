@@ -57,11 +57,11 @@
 
     <button onclick="goBack();">목록으로</button>
     <!-- 여기는 뒤로 가는 게 나을까 홈으로 보내는 게 나을까 -->
-    <button onclick='finish();'>찾음완료</button>다른 말이 낫지않을까 아니 근데 왜 찾은 칸에서 찾음완료를 함? 찾고싶은으로 가야되는거아님? 좀 더 생각해봐이거 지금 확실히 좀 이상함
 
     <div class="menu-container">
         <button class="dots-btn" onclick="toggleMenu()">⋮</button>
         <div id="myDropdown" class="dropdown-menu">
+            <button id='finishBtn' onclick="completePost(postId)">전달 완료</button>
             <button onclick="location.href = `./edit.html?id=${postId}`;">수정하기</button>
             <button onclick="deletePost()" style="color: red;">삭제하기</button>
         </div>
@@ -78,6 +78,7 @@
         const urlParams = new URLSearchParams(window.location.search);
         const postId = urlParams.get('id');
         let currentPost = null;
+        let state = 'Found';
 
         document.addEventListener("DOMContentLoaded", async () => {
             if (!postId) {
@@ -87,6 +88,38 @@
             }
             await loadPostDetail();
         });
+
+        async function completePost(postId) {
+        
+            try {
+                const { data, error } = await client
+                    .from("posts")
+                    .update({ isFound: "completed" })
+                    .select("*")
+                    .eq("id", postId)
+                    .single();
+        
+                if (error) throw error;
+
+                if (data.type === 'Found') {
+                  if (!confirm("분실물 전달을 마치셨나요? 전달 완료 시 목록에서 숨겨집니다.")) return;
+                } else if (data.type === 'Lost') {
+                  if (!confirm("이 분실물을 정말 찾으셨나요? 찾음 완료 시 목록에서 숨겨집니다.")) return;
+                }
+
+                if (data.type === 'Found') {
+                  alert("분실물 전달 완료 처리가 되었습니다.");
+                } else if (data.type === 'Lost') {
+                  alert("분실물 찾음 완료 처리가 되었습니다.");
+                }
+
+                location.replace(`../index.html`);
+                
+            } catch (err) {
+                console.error("상태 업데이트 실패:", err.message);
+                alert("처리에 실패했습니다. 다시 시도해 주세요.");
+            }
+        }
 
         function goBack() {
             const referrer = document.referrer;
@@ -107,6 +140,8 @@
                     .single();
 
                 if (error) throw error;
+
+                if (data.type === 'Lost') document.querySelector("#finishBtn").innerHTML = '찾음 완료';
                 
                 currentPost = data;
                 document.querySelector("#postTitle").innerText = data.title;
@@ -187,10 +222,6 @@
     }
 }
 
-        
-        function finish() {
-            console.log("찾음완료로 전환하고, 글 삭제하거나 말거나 수파베이스 스토리지에 사진지우고")
-        }
     </script>
 </body>
 </html>
