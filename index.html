@@ -11,17 +11,17 @@
     <!-- <button onclick="signOut()">logout</button> -->
     <div id="display" style="display: none;">
 
-<!-- 디폴트 찾은. 찾고 싶은도 같은 페이지에서 필터로 하든 뭐 잘해보셈 -->
+<!-- 디폴트 습득. 찾고 싶은도 같은 페이지에서 필터로 하든 뭐 잘해보셈 -->
 
 <!--
-Found -> 찾은
-Lost -> 찾고싶은
+Found -> 습득
+Lost -> 분실
 -->
-        <button onclick="changeType('Found')">찾은 (디폴트)</button>
-        <button onclick="changeType('Lost')">찾고싶은</button>
+        <button onclick="changeType('Found')">습득</button>
+        <button onclick="changeType('Lost')">분실</button>
 
         <div class="search-container" style="position: relative; display: inline-block;">
-            <input type="text" id="searchKeyword" placeholder="분실물을 검색해 보세요!" onkeyup="if(window.event.keyCode==13){searchPosts()}">
+            <input type="text" id="searchKeyword" placeholder="검색어 입력" onkeyup="if(window.event.keyCode==13){searchPosts()}">
             <button type="button" id="clearSearchBtn" onclick="clearSearch()" style="display: none; margin-left: -25px; background: none; border: none; cursor: pointer;">X</button>
 
             <button onclick="searchPosts()">검색</button>
@@ -30,6 +30,7 @@ Lost -> 찾고싶은
         <div id="body"></div>
 
         <button onclick="location.href=`./HTML/write.html?from=${state}`">글쓰기</button>
+        <!--습득/분실을 말로 쓰지 말고 색으로 표현하는 게 낫지않을까-->
 
     </div>
     <script>
@@ -51,7 +52,14 @@ Lost -> 찾고싶은
         }
 
         async function loadPosts() {
-            const { data: posts, error } = await client.from('posts').select('*').eq('type', state).order('created_at', { ascending: false });
+            const { data: posts, error } = await client
+              .from('posts')
+              .select('*')
+              .match({
+                'type': state,
+                'isFound': "active"
+              })
+              .order('created_at', { ascending: false });
 
         if (error) {
             console.error(error);
@@ -86,6 +94,7 @@ Lost -> 찾고싶은
                     .from("posts")
                     .select("*")
                     .or(`title.ilike.%${keyword}%,body.ilike.%${keyword}%`)
+                    .eq('isFound', "active")
                     .order("created_at", { ascending: false });
 
                 document.querySelector("#clearSearchBtn").style.display = "inline-block"; // 2. X버튼으로 검색창 비우기
@@ -97,7 +106,7 @@ Lost -> 찾고싶은
             } catch (err) {
                 console.error("검색 실패:", err.message);
             }
-        } // 3. 로고 클릭으로 홈으로 가기
+        } // 3. 로고 클릭으로 홈으로 가기 // 이건 아직 안 함
 
         function renderSearchResults(posts) {
             const listContainer = document.querySelector("#body");
@@ -110,7 +119,7 @@ Lost -> 찾고싶은
 
             posts.forEach(post => {
                 const isFoundType = post.type === "Found";
-                const tagText = isFoundType ? "찾은" : "찾고싶은";
+                const tagText = isFoundType ? "습득" : "분실";
                 const tagClass = isFoundType ? "Found" : "Lost";
 
                 const postHtml = `
