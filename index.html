@@ -17,6 +17,52 @@
 Found -> 습득
 Lost -> 분실
 -->
+    <div>
+        <div style="position: relative; width: 24px; height: 24px; display: inline-block; color: #2d7a4f;" onclick='loadPosts();'> <!--3. 로고클릭으로 홈으로 가기-->
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                style="width:24px; height:24px;"
+            >
+                <path d="M11 20A7 7 0 0 1 9.8 6.9C15.5 4.9 17 3.5 19 2c1 2 2 4.5 1 8-1 3.5-3.5 6-7 8.08"/>
+                <path d="M5 19a7 7 0 0 1 3.3-12"/>
+            </svg>
+        
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                style="
+                    position:absolute;
+                    right:-6px;
+                    bottom:-4px;
+                    width:14px;
+                    height:14px;
+                "
+            >
+                <path d="M12 20a8 8 0 1 0 0-16 8 8 0 0 0 0 16Z"/>
+                <path d="M12 14a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z"/>
+                <path d="M12 2v2"/>
+                <path d="M12 20v2"/>
+                <path d="m4.93 4.93 1.41 1.41"/>
+                <path d="m17.66 17.66 1.41 1.41"/>
+                <path d="M2 12h2"/>
+                <path d="M20 12h2"/>
+                <path d="m6.34 17.66-1.41 1.41"/>
+                <path d="m19.07 4.93-1.41 1.41"/>
+            </svg>
+        </div>
+    
+
         <button onclick="changeType('Found')">습득</button>
         <button onclick="changeType('Lost')">분실</button>
 
@@ -26,7 +72,9 @@ Lost -> 분실
 
             <button onclick="searchPosts()">검색</button>
         </div>
+    </div>
 
+    
         <div id="body"></div>
 
         <button onclick="location.href=`./HTML/write.html?from=${state}`">글쓰기</button>
@@ -106,7 +154,7 @@ Lost -> 분실
             } catch (err) {
                 console.error("검색 실패:", err.message);
             }
-        } // 3. 로고 클릭으로 홈으로 가기 // 이건 아직 안 함
+        }
 
         function renderSearchResults(posts) {
             const listContainer = document.querySelector("#body");
