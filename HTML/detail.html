@@ -187,10 +187,10 @@
                     .eq("id", postId)
                     .single();
                 
-                <!-- const { data } = await client
-                    .from("comments")
-                    .select("*")
-                    .eq("id", commentId) --> // id를 쓰는 게 맞는지 / commsntId 선언하셈
+                // const { data } = await client
+                //     .from("comments")
+                //     .select("*")
+                //     .eq("id", commentId) // id를 쓰는 게 맞는지 / commsntId 선언하셈
     
                 if (error) throw error;
     
@@ -199,7 +199,7 @@
                 currentPost = data;
                 document.querySelector("#postTitle").innerText = data.title;
                 document.querySelector("#postBody").innerText = data.body;
-                document.querySelector("#comment").innerText =
+                // document.querySelector("#comment").innerText =
     
                 if (data.image_url) {
                     const imgTag = document.querySelector("#postImage");
