@@ -4,11 +4,49 @@
     <title>Write | Lost & Found</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/heic2any/0.0.4/heic2any.min.js"></script>
-
     <script src="../Login.js"></script>
     <link rel="stylesheet" href="../style.css">
+
+    <style>
+        .menu-container {
+            position: relative;
+            display: inline-block;
+            float: right;
+        .dots-btn {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+        }
+        .dropdown-menu { 
+            display: none;
+            position: absolute;
+            right: 0;
+            background: white;
+            border: 1px solid #ccc;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            z-index: 1;
+        }
+        .dropdown-menu button {
+            white-space: nowrap;
+            display: block; 
+            width: 100%; 
+            padding: 10px 20px; 
+            border: none; 
+            background: none; 
+            cursor: pointer; 
+            text-align: left;
+        }
+        .dropdown-menu button:hover {
+            background: #f5f5f5;
+        }
+        .show {
+            display: block;
+        }
+    }
+    </style>
+    
 </head>
-<body>
     
     <header>
     <div>
@@ -27,9 +65,43 @@
     <textarea id="title" oninput="autoResize(this)" placeholder="제목 입력"></textarea>
     <br />
     <textarea id="body" oninput="autoResize(this)" placeholder="본문 입력"></textarea>
-    
     <br />
-    <h1>위치 정보는 직접 입력보다는 선택하는게 낫겠지 // 선택 필수, 추가 설명</h1>
+
+    <div> <br />
+        어디에서 습득하셨나요?
+        <div class="menu-container">
+            <input type="text" class="dots-btn" onclick='document.querySelector("#myDropdown").classList.toggle("show");' oninput="autoResize(this)" placeholder="테스트" />
+            <div id="myDropdown" class="dropdown-menu">
+                <button>test 1</button>
+                <button>test 2</button>
+                <button>test 3</button>
+            </div>
+        </div>
+        <br />
+    
+        언제 습득하셨나요?
+        어떤 물건을 습득하셨나요?
+        물건의 특징을 알려주세요. ( 색상 / 스티커 / 흠집 / 키링 등 구별할 수 있는 특징 )
+        브랜드 또는 제품명을 입력해주세요. (모르면 비워두셔도 됩니다.)
+        <br />
+    </div>
+
+    <div style="display: none;"> <br />
+        어디에서 분실하셨나요?
+        <br />
+        
+        언제 분실하셨나요? (대략적인 날짜와 시간도 괜찬습니다.)
+        <br />
+        
+        어떤 물건을 분실하셨나요?
+        <br />
+        
+        물건의 특징을 알려주세요. ( 색상 / 스티커 / 흠집 / 키링 등 구별할 수 있는 특징 )
+        <br />
+        
+        브랜드 또는 제품명을 입력해주세요. (모르면 비워두셔도 됩니다.)
+        <br />
+    </div>
     
     <br />
     <input type="file" id="fileInput" />
