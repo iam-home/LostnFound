@@ -116,13 +116,18 @@
         <p id="postBody"></p>
         <img id="postImage" src="" alt="첨부 이미지">
     </div>
+    
+    <!-- comments -->
+    <div id="comment"></div>
+
+
 
     <script>
         const urlParams = new URLSearchParams(window.location.search);
         const postId = urlParams.get('id');
         let currentPost = null;
         let state = 'Found';
-
+    
         document.addEventListener("DOMContentLoaded", async () => {
             if (!postId) {
                 alert("잘못된 접근입니다.");
@@ -131,7 +136,7 @@
             }
             await loadPostDetail();
         });
-
+    
         async function completePost(postId) {
         
             try {
@@ -143,19 +148,19 @@
                     .single();
         
                 if (error) throw error;
-
+    
                 if (data.type === 'Found') {
                   if (!confirm("분실물 전달을 마치셨나요? 전달 완료 시 목록에서 숨겨집니다.")) return;
                 } else if (data.type === 'Lost') {
                   if (!confirm("이 분실물을 정말 찾으셨나요? 찾음 완료 시 목록에서 숨겨집니다.")) return;
                 }
-
+    
                 if (data.type === 'Found') {
                   alert("분실물 전달 완료 처리가 되었습니다.");
                 } else if (data.type === 'Lost') {
                   alert("분실물 찾음 완료 처리가 되었습니다.");
                 }
-
+    
                 location.replace(`../index.html`);
                 
             } catch (err) {
@@ -163,17 +168,17 @@
                 alert("처리에 실패했습니다. 다시 시도해 주세요.");
             }
         }
-
+    
         function goBack() {
             const referrer = document.referrer;
-
+    
             if (referrer.includes("edit.html")) {
                 location.href = "../index.html"; 
             } else {
                 window.history.back();
             }
         }
-
+    
         async function loadPostDetail() {
             try {
                 const { data, error } = await client
@@ -181,31 +186,37 @@
                     .select("*")
                     .eq("id", postId)
                     .single();
-
+                
+                <!-- const { data } = await client
+                    .from("comments")
+                    .select("*")
+                    .eq("id", commentId) --> // id를 쓰는 게 맞는지 / commsntId 선언하셈
+    
                 if (error) throw error;
-
+    
                 if (data.type === 'Lost') document.querySelector("#finishBtn").innerHTML = '찾음 완료';
                 
                 currentPost = data;
                 document.querySelector("#postTitle").innerText = data.title;
                 document.querySelector("#postBody").innerText = data.body;
-
+                document.querySelector("#comment").innerText =
+    
                 if (data.image_url) {
                     const imgTag = document.querySelector("#postImage");
                     imgTag.src = data.image_url;
                     imgTag.style.display = "block";
                 }
-
+    
             } catch (err) {
                 console.error("글 로딩 실패:", err.message);
                 alert("글을 불러오지 못했습니다.");
             }
         }
-
+    
         function toggleMenu() {
             document.querySelector("#myDropdown").classList.toggle("show");
         }
-
+    
         window.onclick = function(event) {
             if (!event.target.matches('.dots-btn')) {
                 const dropdowns = document.getElementsByClassName("dropdown-menu");
@@ -222,49 +233,49 @@
     if (!confirm("정말 이 게시글을 삭제하시겠습니까?")) {
         return;
     }
-
+    
     try {
         const { data: postData, error: fetchError } = await client
             .from("posts")
             .select("image_url")
             .eq("id", postId)
             .single();
-
+    
         if (fetchError) throw fetchError;
-
+    
         if (postData && postData.image_url) {
             const fileName = postData.image_url.split('/').pop();
-
+    
             console.log("스토리지에서 지울 파일명:", fileName);
-
+    
             const { error: storageError } = await client
                 .storage
                 .from('upload')
                 .remove([fileName]);
-
+    
             if (storageError) {
                 console.error("스토리지 사진 삭제 실패:", storageError.message);
             } else {
                 console.log("스토리지 파일 삭제 완수");
             }
         }
-
+    
         const { error: dbError } = await client
             .from("posts")
             .delete()
             .eq("id", postId);
-
+    
         if (dbError) throw dbError;
-
+    
         alert("게시글이 삭제되었습니다.");
         location.replace('../index.html')
-
+    
     } catch (err) {
         console.error("삭제 처리 중 오류 발생:", err.message);
         alert("삭제에 실패했습니다: " + err.message);
     }
-}
-
+    }
+    
     </script>
 </body>
 </html>
