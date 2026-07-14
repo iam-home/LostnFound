@@ -121,7 +121,23 @@
     </div>
     
     <!-- comments -->
-    <div id="comment"></div>
+    <div class="comments-section" style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #eee;">
+        <h3>댓글 (<span id="commentCount">0</span>)</h3>
+    
+        <div id="commentList" style="margin-bottom: 20px;"></div>
+    
+        <div class="comment-input-box" style="display: flex; flex-direction: column; gap: 8px;">
+        <!-- 💡 익명 체크박스 추가 -->
+        <label style="font-size: 13px; color: #666; cursor: pointer;">
+            <input type="checkbox" id="anonymousCheck" /> 익명으로 작성하기
+        </label>
+        
+        <div style="display: flex; gap: 8px;">
+            <input type="text" id="newCommentInput" placeholder="댓글을 남겨주세요." style="flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 4px;" />
+            <button onclick="writeComment()" style="padding: 10px 16px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;">등록</button>
+        </div>
+        </div>
+    </div>
 
 
 
@@ -129,6 +145,8 @@
         const urlParams = new URLSearchParams(window.location.search);
         const postId = urlParams.get('id');
         let currentPost = null;
+        let currentUserId = null;
+        let postAuthorId = "";
         let state = 'Found';
     
         document.addEventListener("DOMContentLoaded", async () => {
@@ -182,6 +200,7 @@
             }
         }
     
+    
         async function loadPostDetail() {
             try {
                 const { data, error } = await client
@@ -189,20 +208,16 @@
                     .select("*")
                     .eq("id", postId)
                     .single();
-                
-                // const { data } = await client
-                //     .from("comments")
-                //     .select("*")
-                //     .eq("id", commentId) // id를 쓰는 게 맞는지 / commsntId 선언하셈
     
                 if (error) throw error;
+                
+                postAuthorId = data.user_id;
     
                 if (data.type === 'Lost') document.querySelector("#finishBtn").innerHTML = '찾음 완료';
                 
                 currentPost = data;
                 document.querySelector("#postTitle").innerText = data.title;
                 document.querySelector("#postBody").innerText = data.body;
-                // document.querySelector("#comment").innerText =
     
                 if (data.image_url) {
                     const imgTag = document.querySelector("#postImage");
@@ -233,51 +248,213 @@
         }
         
         async function deletePost() {
-    if (!confirm("정말 이 게시글을 삭제하시겠습니까?")) {
-        return;
-    }
+            if (!confirm("정말 이 게시글을 삭제하시겠습니까?")) {
+            return;
+        }
     
-    try {
-        const { data: postData, error: fetchError } = await client
-            .from("posts")
-            .select("image_url")
-            .eq("id", postId)
-            .single();
-    
-        if (fetchError) throw fetchError;
-    
-        if (postData && postData.image_url) {
-            const fileName = postData.image_url.split('/').pop();
-    
-            console.log("스토리지에서 지울 파일명:", fileName);
-    
-            const { error: storageError } = await client
-                .storage
-                .from('upload')
-                .remove([fileName]);
-    
-            if (storageError) {
-                console.error("스토리지 사진 삭제 실패:", storageError.message);
-            } else {
-                console.log("스토리지 파일 삭제 완수");
+        try {
+            const { data: postData, error: fetchError } = await client
+                .from("posts")
+                .select("image_url")
+                .eq("id", postId)
+                .single();
+        
+            if (fetchError) throw fetchError;
+        
+            if (postData && postData.image_url) {
+                const fileName = postData.image_url.split('/').pop();
+        
+                console.log("스토리지에서 지울 파일명:", fileName);
+        
+                const { error: storageError } = await client
+                    .storage
+                    .from('upload')
+                    .remove([fileName]);
+        
+                if (storageError) {
+                    console.error("스토리지 사진 삭제 실패:", storageError.message);
+                } else {
+                    console.log("스토리지 파일 삭제 완수");
+                }
+            }
+        
+            const { error: dbError } = await client
+                .from("posts")
+                .delete()
+                .eq("id", postId);
+        
+            if (dbError) throw dbError;
+        
+            alert("게시글이 삭제되었습니다.");
+            location.replace('../index.html')
+        
+        } catch (err) {
+            console.error("삭제 처리 중 오류 발생:", err.message);
+            alert("삭제에 실패했습니다: " + err.message);
+        }
+        }
+  
+
+        async function checkUserSession() {
+            try {
+                const { data: { user }, error } = await client.auth.getUser();
+                
+                if (error) throw error;
+                
+                if (user) {
+                    currentUserId = user.id;
+                    console.log("현재 로그인한 유저 UUID:", currentUserId);
+                } else {
+                    currentUserId = null;
+                    console.log("로그인되지 않은 사용자입니다.");
+                }
+            } catch (err) {
+                console.error("유저 세션 확인 실패:", err.message);
+                currentUserId = null;
             }
         }
     
-        const { error: dbError } = await client
-            .from("posts")
-            .delete()
-            .eq("id", postId);
-    
-        if (dbError) throw dbError;
-    
-        alert("게시글이 삭제되었습니다.");
-        location.replace('../index.html')
-    
-    } catch (err) {
-        console.error("삭제 처리 중 오류 발생:", err.message);
-        alert("삭제에 실패했습니다: " + err.message);
-    }
-    }
+        window.addEventListener("DOMContentLoaded", async () => {
+            await checkUserSession();
+            loadPostDetail();
+            loadComments();
+        });
+        
+        async function loadComments() {
+            try {
+                const { data: comments, error } = await client
+                    .from("comments")
+                    .select("*")
+                    .eq("post_id", postId)
+                    .order("created_at", { ascending: true }); // 오래된 순으로 정렬
+        
+                if (error) throw error;
+        
+                const commentList = document.querySelector("#commentList");
+                const commentCount = document.querySelector("#commentCount");
+                
+                commentCount.innerText = comments.length;
+                commentList.innerHTML = "";
+        
+                if (comments.length === 0) {
+                    commentList.innerHTML = `<p style="color: #999; font-size: 14px;">첫 번째 댓글을 남겨보세요!</p>`;
+                    return;
+                }
+        
+                comments.forEach(comment => {
+                    const isAuthor = comment.user_id === postAuthorId;
+                    const authorBadge = isAuthor ? `<span class="author-badge" style="background-color: #e3f2fd; color: #0d47a1; font-size: 11px; padding: 2px 6px; border-radius: 10px; margin-left: 6px; font-weight: bold;">작성자</span>` : "";
+                    const editedText = comment.isEdited ? `<span style="font-size: 11px; color: #999; margin-left: 6px;">(수정됨)</span>` : "";
+                    const isMyComment = comment.user_id === currentUserId;
+                    const actionButtons = isMyComment ? `
+                        <div style="font-size: 12px; margin-top: 4px;">
+                            <a href="#" onclick="editCommentPrompt('${comment.id}', '${comment.content}')" style="color: #007bff; text-decoration: none; margin-right: 8px;">수정</a>
+                            <a href="#" onclick="deleteComment('${comment.id}')" style="color: #dc3545; text-decoration: none;">삭제</a>
+                        </div>
+                    ` : "";
+                    const commentItem = document.createElement("div");
+                    commentItem.style.padding = "12px 0";
+                    commentItem.style.borderBottom = "1px solid #f5f5f5";
+                    commentItem.innerHTML = `
+                        <div style="display: flex; align-items: center; justify-content: space-between;">
+                            <div>
+                                <strong style="font-size: 14px; color: #333;">${comment.commenterName}</strong> ${authorBadge}
+                                <span style="font-size: 11px; color: #bbb; margin-left: 8px;">${new Date(comment.created_at).toLocaleString()}</span>
+                                ${editedText}
+                            </div>
+                        </div>
+                        <p style="font-size: 14px; color: #444; margin: 6px 0 0 0; line-height: 1.4;">${comment.content}</p>
+                        ${actionButtons}
+                    `;
+                    commentList.appendChild(commentItem);
+                });
+        
+            } catch (err) {
+                console.error("댓글 불러오기 실패:", err.message);
+            }
+        }
+        
+        async function writeComment() {
+            const inputEl = document.querySelector("#newCommentInput");
+            const content = inputEl.value.trim();
+            const isAnonymous = document.querySelector("#anonymousCheck").checked;
+        
+            if (!content) {
+                alert("댓글 내용을 입력해 주세요.");
+                return;
+            }
+        
+            try {
+                const { data: { user } } = await client.auth.getUser();
+                let commenterName = "익명";
+                
+                if (user && !isAnonymous) commenterName = user.user_metadata.full_name || user.email.split('@')[0];
+                
+                const { error } = await client
+                    .from("comments")
+                    .insert([
+                        {
+                            post_id: postId,
+                            user_id: user ? user.id : "anonymous-user",
+                            commenterName: commenterName,
+                            content: content,
+                        }
+                    ]);
+        
+                if (error) throw error;
+        
+                inputEl.value = "";
+                document.querySelector("#anonymousCheck").checked = false;
+                loadComments();
+            } catch (err) {
+                alert("댓글 등록 실패: " + err.message);
+            }
+        }
+        
+        async function editCommentPrompt(commentId, currentContent) {
+            const newContent = prompt("댓글 수정하기", currentContent);
+            
+            if (newContent === null) return;
+            if (newContent.trim() === "") {
+                alert("내용을 입력하세요.");
+                return;
+            }
+        
+            try {
+                const { error } = await client
+                    .from("comments")
+                    .update({ 
+                        content: newContent.trim(),
+                        isEdited: true
+                    })
+                    .eq("id", commentId);
+        
+                if (error) throw error;
+        
+                alert("댓글이 수정되었습니다.");
+                loadComments();
+            } catch (err) {
+                alert("수정 실패: " + err.message);
+            }
+        }
+        
+        async function deleteComment(commentId) {
+            if (!confirm("정말 이 댓글을 삭제하시겠습니까?")) return;
+        
+            try {
+                const { error } = await client
+                    .from("comments")
+                    .delete()
+                    .eq("id", commentId);
+        
+                if (error) throw error;
+        
+                alert("댓글이 삭제되었습니다.");
+                loadComments();
+            } catch (err) {
+                alert("삭제 실패: " + err.message);
+            }
+        }
     
     </script>
 </body>
