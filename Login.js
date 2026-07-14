@@ -37,7 +37,7 @@ async function signInWithGoogle() {
       const { data, error } = await client.auth.signInWithOAuth({
         provider: 'google',
         options: {
-      redirectTo: 'http://127.0.0.1:5500/LostnFound/',
+      redirectTo: window.location.origin,
       queryParams: {
         prompt: 'select_account',
         access_tpye: 'offline'
