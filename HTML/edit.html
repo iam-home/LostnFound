@@ -11,6 +11,7 @@
 </head>
 <body>
     
+    <button onclick="goBack();">취소</button>
     <textarea id="title" oninput="autoResize(this)" placeholder="수정할 제목을 입력하세요"></textarea>
     <textarea id="body" oninput="autoResize(this)" placeholder="수정할 내용을 입력하세요"></textarea>
     
@@ -35,6 +36,20 @@
         
         let isImageDeleted = false;
         let originalImageName = null;
+
+
+        function goBack() {
+            const titleVal = document.querySelector("#title").value.trim();
+            const bodyVal = document.querySelector("#body").value.trim();
+
+            if (titleVal !== "" || bodyVal !== "") {
+                if (confirm("수정 중이던 내용을 취소하시겠습니까? (이전 내용은 그대로 유지됩니다.)")) {
+                    history.back();
+                }
+            } else {
+                history.back();
+            }
+        }
         
         document.addEventListener("DOMContentLoaded", async () => {
             if (!editId) {
@@ -156,7 +171,7 @@
                 if (error) throw error;
         
                 alert("수정되었습니다.");
-                location.replace(`./detail.html?id=${editId}`); 
+                location.replace(`./detail.html?id=${editId}`);
             
             } catch (err) {
                 console.error("수정 실패:", err.message);
@@ -169,7 +184,6 @@
         // const isLogin = await dever();
 
         if (!isLogin) {
-            alert("로그인이 필요합니다.");
             location.href = "../index.html";
             return;
         }

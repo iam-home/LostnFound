@@ -75,23 +75,21 @@ Lost -> 분실
     
         <div id="body"></div>
 
-        <button onclick="location.href=`./HTML/write.html?from=${state}`">글쓰기</button>
+        <button onclick="openWritePage(state)">글쓰기</button>
         <!--습득/분실을 말로 쓰지 말고 색으로 표현하는 게 낫지않을까-->
 
     </div>
     <script>
-
         let state = 'Found';
+
+        function openWritePage(type) {
+            history.pushState({ page: 'write', tab: type }, '', `./write.html?from=${type}`);
+            location.replace(`./HTML/write.html?from=${type}`);
+        }
 
         async function init() {
             const isLogin = await checkLogin();
             // const isLogin = await dever();
-
-            if (!isLogin) {
-                alert("로그인이 필요합니다.");
-                location.href = "/index.html";
-                return;
-            }
 
             if (isLogin) document.querySelector("#display").style.display = 'block';
             else if (!isLogin) document.querySelector("#display").style.display = 'none';
@@ -192,6 +190,18 @@ Lost -> 분실
             document.querySelector("#clearSearchBtn").style.display = "none";
             loadPosts();
         }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const lastTab = localStorage.getItem('lastTab');
+
+            if (lastTab === 'Lost') {
+                changeType('Lost');
+            }
+
+            localStorage.removeItem('lastTab');
+        });
+
+        
 
         loadPosts(); // 디폴트이심
         init();

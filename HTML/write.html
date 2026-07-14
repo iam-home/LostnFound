@@ -424,8 +424,11 @@
     
             if (dbError) throw dbError;
     
+            localStorage.setItem('lastTab', fromSource);
+
             alert("게시글이 등록되었습니다.");
             location.replace("../index.html");
+            // history.back();
     
         } catch (err) {
             console.error("등록 과정 오류 발생:", err.message);
@@ -438,10 +441,12 @@
     function goBack() {
         if ( document.querySelector("#title").value.trim() !== "" || document.querySelector("#body").value.trim() !== "") {
             if (confirm("작성 중인 내용은 저장되지 않습니다. 나가시겠습니까?")) {
-                window.history.back();
+                // location.replace("../index.html");
+                history.back();
             }
         } else {
-            window.history.back();
+            // location.replace("../index.html");
+            history.back();
         }
     }
     
@@ -450,7 +455,6 @@
         // const isLogin = await dever();
 
         if (!isLogin) {
-            alert("로그인이 필요합니다.");
             location.href = "../index.html";
             return;
         }
@@ -460,10 +464,12 @@
         const urlParams = new URLSearchParams(window.location.search);
         fromSource = urlParams.get('from');
         
+        if (fromSource) {
+            localStorage.setItem('lastTab', fromSource);
+        }
         
         if (fromSource === 'Lost') {
             document.querySelector("#whatIsThisState").innerHTML = '분실 글쓰기';
-            
             document.querySelector("#where").innerHTML = '어디에서 분실하셨나요?';
             document.querySelector("#when").innerHTML = '언제 분실하셨나요?';
             document.querySelector("#what").innerHTML = '어떤 물건을 분실하셨나요?';

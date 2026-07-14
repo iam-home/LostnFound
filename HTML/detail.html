@@ -101,7 +101,7 @@
     <button onclick="goBack();">목록으로</button>
     <!-- 여기는 뒤로 가는 게 나을까 홈으로 보내는 게 나을까 -->
 
-    <div class="menu-container">
+    <div class="menu-container" id="whoAreU" style="display: none;">
         <button class="dots-btn" onclick="toggleMenu()">⋮</button>
         <div id="myDropdown" class="dropdown-menu">
             <button id='finishBtn' onclick="completePost(postId)">전달 완료</button>
@@ -147,7 +147,7 @@
         let currentUserId = null;
         let postAuthorId = "";
         let state = 'Found';
-    
+        
         document.addEventListener("DOMContentLoaded", async () => {
             if (!postId) {
                 alert("잘못된 접근입니다.");
@@ -158,36 +158,35 @@
         });
     
         async function completePost(postId) {
-        
-            try {
-                const { data, error } = await client
-                    .from("posts")
-                    .update({ isFound: "completed" })
-                    .select("*")
-                    .eq("id", postId)
-                    .single();
-        
-                if (error) throw error;
-    
-                if (data.type === 'Found') {
-                  if (!confirm("분실물 전달을 마치셨나요? 전달 완료 시 목록에서 숨겨집니다.")) return;
-                } else if (data.type === 'Lost') {
-                  if (!confirm("이 분실물을 정말 찾으셨나요? 찾음 완료 시 목록에서 숨겨집니다.")) return;
-                }
-    
-                if (data.type === 'Found') {
-                  alert("분실물 전달 완료 처리가 되었습니다.");
-                } else if (data.type === 'Lost') {
-                  alert("분실물 찾음 완료 처리가 되었습니다.");
-                }
-    
-                location.replace(`../index.html`);
-                
-            } catch (err) {
-                console.error("상태 업데이트 실패:", err.message);
-                alert("처리에 실패했습니다. 다시 시도해 주세요.");
-            }
+        if (currentPost.type === 'Found') {
+            if (!confirm("분실물 전달을 마치셨나요? 전달 완료 시 목록에서 숨겨집니다.")) return;
+        } else if (currentPost.type === 'Lost') {
+            if (!confirm("이 분실물을 정말 찾으셨나요? 찾음 완료 시 목록에서 숨겨집니다.")) return;
         }
+
+        try {
+            const { data, error } = await client
+                .from("posts")
+                .update({ isFound: "completed" })
+                .select("*")
+                .eq("id", postId)
+                .single();
+
+            if (error) throw error;
+
+            if (data.type === 'Found') {
+                alert("분실물 전달 완료 처리가 되었습니다.");
+            } else if (data.type === 'Lost') {
+                alert("분실물 찾음 완료 처리가 되었습니다.");
+            }
+
+            location.replace(`../index.html`);
+            
+        } catch (err) {
+            console.error("상태 업데이트 실패:", err.message);
+            alert("처리에 실패했습니다. 다시 시도해 주세요.");
+        }
+    }
     
         function goBack() {
             const referrer = document.referrer;
@@ -201,32 +200,36 @@
     
     
         async function loadPostDetail() {
-            try {
-                const { data, error } = await client
-                    .from("posts")
-                    .select("*")
-                    .eq("id", postId)
-                    .single();
+            const { data: { user } } = await client.auth.getUser();
+            currentUserId = user ? user.id : null;
+            const { data, error } = await client
+                .from("posts")
+                .select("*")
+                .eq("id", postId)
+                .single();
     
-                if (error) throw error;
+            if (error) throw error;
                 
-                postAuthorId = data.user_id;
+            postAuthorId = data.user_id;
+
+            const menuContainer = document.querySelector("#whoAreU");
     
-                if (data.type === 'Lost') document.querySelector("#finishBtn").innerHTML = '찾음 완료';
+            if (currentUserId && currentUserId === data.user_id) {
+                menuContainer.style.display = "block"; 
+            } else {
+                menuContainer.style.display = "none"; 
+            }
+    
+            if (data.type === 'Lost') document.querySelector("#finishBtn").innerHTML = '찾음 완료';
                 
-                currentPost = data;
-                document.querySelector("#postTitle").innerText = data.title;
-                document.querySelector("#postBody").innerText = data.body;
+            currentPost = data;
+            document.querySelector("#postTitle").innerText = data.title;
+            document.querySelector("#postBody").innerText = data.body;
     
-                if (data.image_url) {
-                    const imgTag = document.querySelector("#postImage");
-                    imgTag.src = data.image_url;
-                    imgTag.style.display = "block";
-                }
-    
-            } catch (err) {
-                console.error("글 로딩 실패:", err.message);
-                alert("글을 불러오지 못했습니다.");
+            if (data.image_url) {
+                const imgTag = document.querySelector("#postImage");
+                imgTag.src = data.image_url;
+                imgTag.style.display = "block";
             }
         }
     
@@ -460,7 +463,6 @@
         // const isLogin = await dever();
 
         if (!isLogin) {
-            alert("로그인이 필요합니다.");
             location.href = "../index.html";
             return;
         }
