@@ -84,8 +84,14 @@ Lost -> 분실
         let state = 'Found';
 
         async function init() {
-            // const isLogin = await checkLogin();
-            const isLogin = await dever();
+            const isLogin = await checkLogin();
+            // const isLogin = await dever();
+
+            if (!isLogin) {
+                alert("로그인이 필요합니다.");
+                location.href = "/index.html";
+                return;
+            }
 
             if (isLogin) document.querySelector("#display").style.display = 'block';
             else if (!isLogin) document.querySelector("#display").style.display = 'none';

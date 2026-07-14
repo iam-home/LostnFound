@@ -139,13 +139,29 @@
                 위치를 선택해 주세요
             </button>
             <div id="locationDropdown" class="dropdown-menu">
-                <button type="button" onclick="selectLocation('')"></button>
-                <button type="button" onclick="selectLocation('기타')">기타</button>
+                <button type="button" onclick="selectLocation('교실')">교실</button> <!--앞인지 안인지 / 어느 교실-->
+                <button type="button" onclick="selectLocation('체육관')">체육관</button>
+                <button type="button" onclick="selectLocation('도서실')">도서실</button> <!--앞인지 안인지-->
+                <button type="button" onclick="selectLocation('다목적실')">다목적실</button> <!--앞인지 안인지-->
+                <button type="button" onclick="selectLocation('급식실')">급식실</button>
+                <button type="button" onclick="selectLocation('교무실')">교무실</button> <!--앞 / 어느 교무실인지-->
+                <button type="button" onclick="selectLocation('홈베이스')">홈베이스</button> <!--어느 층 홈베이스-->
+                <button type="button" onclick="selectLocation('특별실')">특별실 (음악실, 미술실, 심화학습실, 물리실, 화학실 등)</button>
+                <button type="button" onclick="selectLocation('중앙 복도')">중앙 복도</button> <!--몇 층인지-->
+                <button type="button" onclick="selectLocation('기타')">기타 (운동장, 신발장, 분리수거장, 화장실 등)</button>
             </div>
         </div>
     </div>
     
-    <input type="text" id="customInputL" placeholder="어디서 잃어버리셨나요?" style="display: none; margin-top: 8px; width: 100%;" />
+    <div id="subLocationContainer" class="sub-input-group">
+        <select id="subPositionSelect" class="sub-select" style="display: none;">
+        <option value="안쪽">실내 (안쪽)</option>
+        <option value="앞(복도)">실외 (바로 앞 복도)</option>
+        </select>
+        <input type="text" id="subDetailInput" class="form-input" placeholder="" style="display: none;" />
+    </div>
+
+    <input type="text" id="customInputLocationocation" placeholder="어디서 잃어버리셨나요?" style="display: none; margin-top: 8px; width: 100%;" />
     <br />
 
     <!-- 2. 습득 날짜 (선택) -->
@@ -184,7 +200,6 @@
         <label class="form-label">물건의 특징을 알려주세요. <span class="sub-label">(색상 / 스티커 / 흠집 / 키링 등)</span></label>
         <div class="input-container">
             <input type="text" id="featureBtn" class="form-input" />
-            <!-- 아니 이거 값 왜 안드가냐 -->
         </div>
     </div>
 
@@ -211,6 +226,7 @@
     let chosenLocation = "미지정";
     let chosenCategory = "미지정";
     let chosenFeature = "특징 없음";
+    let finalLocation = "";
     const today = new Date().toISOString().split('T')[0];
     document.querySelector("#dateInput").max = today;
 
@@ -220,17 +236,53 @@
         document.querySelector("#locationBtn").innerText = val;
         document.querySelector("#locationDropdown").classList.remove("show");
         
-        const customInputL = document.querySelector("#customInputL");
-        
-        if (val === "기타") {
-            customInputL.style.display = "block";
-            customInputL.focus();
-        } else {
-            customInputL.style.display = "none";
-            customInputL.value = "";
+        const container = document.querySelector("#subLocationContainer");
+        const positionSelect = document.querySelector("#subPositionSelect");
+        const detailInput = document.querySelector("#subDetailInput");
+
+        container.style.display = "none";
+        positionSelect.style.display = "none";
+        detailInput.style.display = "none";
+        detailInput.value = "";
+
+        if (!val) return;
+
+        if (val === "교실") {
+            container.style.display = "block";
+            positionSelect.style.display = "block";
+            detailInput.style.display = "block";
+            detailInput.placeholder = "몇 학년 몇 반 교실인지 입력 (예: 3-2)";
+            detailInput.focus();
+        } else if (val === "도서실" || val === "다목적실") {
+            container.style.display = "block";
+            positionSelect.style.display = "block";
+        } else if (val === "교무실") {
+            container.style.display = "block";
+            detailInput.style.display = "block";
+            detailInput.placeholder = "어느 교무실인지 입력 (예: 2층 교무실, 3학년 교무실)";
+            detailInput.focus();
+        } else if (val === "홈베이스") {
+            container.style.display = "block";
+            detailInput.style.display = "block";
+            detailInput.placeholder = "몇 층 홈베이스인지 입력 (예: 3층)";
+            detailInput.focus();
+        } else if (val === "특별실") {
+            container.style.display = "block";
+            detailInput.style.display = "block";
+            detailInput.placeholder = "정확한 실명 입력 (예: 음악실, 미술실, 물리실, 화학실 등)";
+            detailInput.focus();
+        } else if (val === "중앙 복도") {
+            container.style.display = "block";
+            detailInput.style.display = "block";
+            detailInput.placeholder = "몇 층 복도인지 입력 (예: 1층)";
+            detailInput.focus();
+        } else if (val === "기타") {
+            container.style.display = "block";
+            detailInput.style.display = "block";
+            detailInput.placeholder = fromSource === 'Lost' ? "잃어버린 곳 입력" : "습득한 곳 입력";
+            detailInput.focus();
         }
     }
-    
     function selectCategory(val) {
         chosenCategory = val;
         document.querySelector("#categoryBtn").innerText = val;
@@ -245,12 +297,6 @@
             customInput.style.display = "none";
             customInput.value = "";
         }
-    }
-
-    function selectFeature(val) {
-        chosenFeature = val;
-        document.querySelector("#featureBtn").innerText = val;
-        document.querySelector("#featureDropdown").classList.remove("show");
     }
 
     window.addEventListener("click", function(event) {
@@ -278,24 +324,42 @@
         const fileInput = document.querySelector("#fileInput");
         const dateVal = document.querySelector("#dateInput").value || "날짜 미선택";
         const brandVal = document.querySelector("#brandInput").value.trim() || "정보 없음";
-        const generatedTitle = `[${chosenCategory}] ${chosenLocation}`; // 이거 쓰는 변수맞냐
-        let finalCategory = chosenCategory;
-        let finalLocation = chosenLocation
         
+        const featureInputVal = document.querySelector("#featureBtn").value.trim();
+        const chosenFeature = featureInputVal || "특징 없음";
+
+        let finalCategory = chosenCategory;
         if (chosenCategory === "기타") {
             let customVal = document.querySelector("#customCategoryInput").value.trim();
             finalCategory = customVal || "기타(미입력)";
         }
-        if (chosenLocation === "기타") {
-            let customVal = document.querySelector("#customInputL").value.trim();
-            finalLocation = customVal || "기타(미입력)";
-            
+
+        if (chosenLocation === "미지정") {
+            alert(fromSource === 'Lost' ? "물건을 분실하신 위치를 선택해 주세요." : "물건을 습득하신 위치를 선택해 주세요.");
+            return;
         }
 
-        // 이거 분실로 바꿔야되지않냐
+        finalLocation = chosenLocation;
+        const positionSelect = document.querySelector("#subPositionSelect");
+        const detailInput = document.querySelector("#subDetailInput");
+
+        if (chosenLocation === "교실") {
+            const detailVal = detailInput.value.trim() || "미입력 반";
+            const posVal = positionSelect.value;
+            finalLocation = `교실 (${detailVal} / ${posVal})`;
+        } else if (chosenLocation === "도서실" || chosenLocation === "다목적실") {
+            const posVal = positionSelect.value;
+            finalLocation = `${chosenLocation} (${posVal})`;
+        } else if (["교무실", "홈베이스", "특별실", "중앙 복도", "기타"].includes(chosenLocation)) {
+            const detailVal = detailInput.value.trim();
+            finalLocation = detailVal ? `${chosenLocation} (${detailVal})` : `${chosenLocation} (상세 미입력)`;
+        }
+
+        const typeLabel = fromSource === 'Lost' ? '분실' : '습득';
+
         const combinedBody = `
-        - 습득 위치: ${finalLocation}
-        - 습득 일시: ${dateVal}
+        - ${typeLabel} 위치: ${finalLocation}
+        - ${typeLabel} 일시: ${dateVal}
         - 물품 종류: ${finalCategory}
         - 물품 특징: ${chosenFeature}
         - 브랜드/제품명: ${brandVal}
@@ -308,7 +372,7 @@
         if (body === "") { alert("내용을 입력해주세요."); return; }
 
         if (selectLocation === "") {
-            alert("물건을 습득하신 위치를 선택해 주세요!");
+            alert("물건을 습득하신 위치를 선택해 주세요.");
             return;
         }
         
@@ -374,16 +438,22 @@
     function goBack() {
         if ( document.querySelector("#title").value.trim() !== "" || document.querySelector("#body").value.trim() !== "") {
             if (confirm("작성 중인 내용은 저장되지 않습니다. 나가시겠습니까?")) {
-                window.history.back(); // 이거 분실에서 글쓰기로 드갔을떄 뒤로 가면 습득으로 가짐. 뭔가 해보셈
+                window.history.back();
             }
         } else {
             window.history.back();
         }
     }
     
-    async function init() { // 중간에 로그인 풀 수 있는 방법이 있을까. 있으면 조건문 더 써야돠는디
-        // await signInWithGoogle();
-        await dever();
+    async function init() {
+        const isLogin = await checkLogin();
+        // const isLogin = await dever();
+
+        if (!isLogin) {
+            alert("로그인이 필요합니다.");
+            location.href = "../index.html";
+            return;
+        }
     }
     
     document.addEventListener("DOMContentLoaded", async () => {

@@ -164,6 +164,19 @@
             }
         }
 
+        async function init() {
+        const isLogin = await checkLogin();
+        // const isLogin = await dever();
+
+        if (!isLogin) {
+            alert("로그인이 필요합니다.");
+            location.href = "../index.html";
+            return;
+        }
+    }
+
+    init();
+
     </script>
 </body>
 </html>
