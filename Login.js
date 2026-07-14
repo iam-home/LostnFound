@@ -56,8 +56,8 @@ async function signInWithGoogle() {
 
 
 
-// for test
-async function dever() { // 테스트용 이메일 로그인
+// 테스트용 이메일 로그인
+async function dever() {
   try {
     const { data, error } = await client.auth.signInWithPassword({
     email: 'test@gmail.com',

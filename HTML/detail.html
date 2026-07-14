@@ -111,7 +111,7 @@
     </div>
 
     <div id="postDetail">
-        <h1 id="postTitle">로딩 중...</h1> <!--이거 좀 별로지않냐-->
+        <h1 id="postTitle">로딩 중...</h1>
         <hr>
 
 
@@ -127,7 +127,6 @@
         <div id="commentList" style="margin-bottom: 20px;"></div>
     
         <div class="comment-input-box" style="display: flex; flex-direction: column; gap: 8px;">
-        <!-- 💡 익명 체크박스 추가 -->
         <label style="font-size: 13px; color: #666; cursor: pointer;">
             <input type="checkbox" id="anonymousCheck" /> 익명으로 작성하기
         </label>
@@ -455,6 +454,18 @@
                 alert("삭제 실패: " + err.message);
             }
         }
+
+        async function init() {
+        const isLogin = await checkLogin();
+        // const isLogin = await dever();
+
+        if (!isLogin) {
+            alert("로그인이 필요합니다.");
+            location.href = "../index.html";
+            return;
+        }
+    }
+    init();
     
     </script>
 </body>
