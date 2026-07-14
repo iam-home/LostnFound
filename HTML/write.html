@@ -128,26 +128,29 @@
     <br />
     <textarea id="body" oninput="autoResize(this)" placeholder="본문 입력"></textarea>
     <br />
-
-    <!-- 박스 밖을 누르면 박스가 닫히는 거도 하셈 -->
-    <div id="forFounder" class="form-container">
     
+
+    <div class="form-container">
     <!-- 1. 습득 위치 (선택) -->
     <div class="form-group">
-        <label class="form-label">어디에서 습득하셨나요?</label>
+        <label class="form-label" id="where">어디에서 습득하셨나요?</label>
         <div class="menu-container">
             <button type="button" id="locationBtn" class="dots-btn" onclick='document.querySelector("#locationDropdown").classList.toggle("show");'>
                 위치를 선택해 주세요
             </button>
             <div id="locationDropdown" class="dropdown-menu">
-                <button type="button" onclick="selectLocation('여기도 입력')">여기 입력</button>
+                <button type="button" onclick="selectLocation('')"></button>
+                <button type="button" onclick="selectLocation('기타')">기타</button>
             </div>
         </div>
     </div>
+    
+    <input type="text" id="customInputLocation" placeholder="어디서 잃어버리셨나요?" style="display: none; margin-top: 8px; width: 100%;" />
+    <br />
 
     <!-- 2. 습득 날짜 (선택) -->
     <div class="form-group">
-        <label class="form-label">언제 습득하셨나요?</label>
+        <label class="form-label" id="when">언제 습득하셨나요?</label>
         <div class="input-container">
             <input type="date" id="dateInput" class="form-input" />
         </div>
@@ -155,62 +158,46 @@
 
     <!-- 3. 물건 종류 (선택) -->
     <div class="form-group">
-        <label class="form-label">어떤 물건을 습득하셨나요?</label>
+        <label class="form-label" id="what">어떤 물건을 습득하셨나요?</label>
         <div class="menu-container">
             <button type="button" id="categoryBtn" class="dots-btn" onclick='document.querySelector("#categoryDropdown").classList.toggle("show");'>
                 물건 종류를 선택해 주세요
             </button>
             <div id="categoryDropdown" class="dropdown-menu">
-                <button type="button" onclick="selectCategory('전자기기')">전자기기 (이어폰, 폰 등)</button>
-                <button type="button" onclick="selectCategory('지갑/카드')">지갑 / 카드</button>
-                <button type="button" onclick="selectCategory('도서/학용품')">도서 / 학용품</button>
-                <button type="button" onclick="selectCategory('기타')">기타 물품</button>
+                <button type="button" onclick="selectCategory('전자기기')">전자기기 (태블릿, 노트북, 이어폰, 애플펜슬 등)</button>
+                <button type="button" onclick="selectCategory('필기구')">필기구 (필통, 샤프, 볼펜, 형광펜 등)</button>
+                <button type="button" onclick="selectCategory('지갑')">지갑</button>
+                <button type="button" onclick="selectCategory('신분증/카드')">신분증/카드 (학생증, 주민등록증, 교통카드 등)</button>
+                <button type="button" onclick="selectCategory('의류')">의류 (교복, 겉옷, 우산, 모자 등)</button>
+                <button type="button" onclick="selectCategory('생활용품')">생활용품 (텀블러, 안녕, 화장품 등)</button>
+                <button type="button" onclick="selectCategory('기타')">기타 물품 (인형, 악세서리, 시계, 교과서, 키링 등)</button>
             </div>
         </div>
     </div>
+    
+    <input type="text" id="customCategoryInput" placeholder="물품 종류를 입력해주세요" style="display: none; margin-top: 8px; width: 100%;" />
+    <br />
+
 
     <!-- 4. 물건 특징 (선택 || 입력) -->
     <div class="form-group">
         <label class="form-label">물건의 특징을 알려주세요. <span class="sub-label">(색상 / 스티커 / 흠집 / 키링 등)</span></label>
-        <div class="menu-container">
-            <button type="button" id="featureBtn" class="dots-btn" onclick='document.querySelector("#featureDropdown").classList.toggle("show");'>
-                주요 색상/특징 선택
-            </button>
-            <div id="featureDropdown" class="dropdown-menu">
-                <button type="button" onclick="selectFeature('흰색 계열')">흰색 계열</button>
-                <button type="button" onclick="selectFeature('검은색 계열')">검은색 계열</button>
-                <button type="button" onclick="selectFeature('특이한 케이스/스티커 있음')">케이스/스티커 있음</button>
-            </div>
+        <div class="input-container">
+            <input type="text" id="featureBtn" class="form-input" />
+            <!-- 아니 이거 값 왜 안드가냐 -->
         </div>
     </div>
 
     <!-- 5. 브랜드/제품명 (입력) -->
     <div class="form-group">
-        <label class="form-label">브랜드 또는 제품명을 입력해주세요. <span class="sub-label">(모르면 비워두기)</span></label>
+        <label class="form-label" id="WTFbrand">브랜드 또는 제품명을 입력해주세요. <span class="sub-label">(모르면 비워두셔도 됩니다.)</span></label>
         <div class="input-container">
             <input type="text" id="brandInput" class="form-input" placeholder="예: 에어팟 프로, 모나미 볼펜 등" />
         </div>
     </div>
 
 </div>
-<!--------------------------------------------->
-    <div id="forLoster" style="display: none;"> <br />
-        어디에서 분실하셨나요?
-        <br />
-        
-        언제 분실하셨나요? (대략적인 날짜와 시간도 괜찬습니다.)
-        <br />
-        
-        어떤 물건을 분실하셨나요?
-        <br />
-        
-        물건의 특징을 알려주세요. ( 색상 / 스티커 / 흠집 / 키링 등 구별할 수 있는 특징 )
-        <br />
-        
-        브랜드 또는 제품명을 입력해주세요. (모르면 비워두셔도 됩니다.)
-        <br />
-    </div>
-    
+
     <br />
     <input type="file" id="fileInput" />
     <h5>※ 사진이 있으면 분실자가 물건을 찾을 확률이 크게 높아집니다.</h5>
@@ -222,26 +209,63 @@
     <script>
     let fromSource = null;
     let chosenLocation = "미지정";
-    let chosenCategory = "기타";
+    let chosenCategory = "미지정";
     let chosenFeature = "특징 없음";
+    const today = new Date().toISOString().split('T')[0];
+    document.querySelector("#dateInput").max = today;
+
 
     function selectLocation(val) {
         chosenLocation = val;
         document.querySelector("#locationBtn").innerText = val;
         document.querySelector("#locationDropdown").classList.remove("show");
+        
+        const customInputL = document.querySelector("#customInputLocation");
+        
+        if (val === "기타") {
+            customInputL.style.display = "block";
+            customInputLocationn.focus();
+        } else {
+            customInputL.style.display = "none";
+            customInputL.value = "";
+        }
     }
+    
     function selectCategory(val) {
         chosenCategory = val;
         document.querySelector("#categoryBtn").innerText = val;
         document.querySelector("#categoryDropdown").classList.remove("show");
+    
+        const customInput = document.querySelector("#customCategoryInput");
+        
+        if (val === "기타") {
+            customInput.style.display = "block";
+            customInput.focus();
+        } else {
+            customInput.style.display = "none";
+            customInput.value = "";
+        }
     }
+
     function selectFeature(val) {
         chosenFeature = val;
         document.querySelector("#featureBtn").innerText = val;
         document.querySelector("#featureDropdown").classList.remove("show");
     }
 
-
+    window.addEventListener("click", function(event) {
+        if (!event.target.matches('.dots-btn')) {
+            const dropdowns = document.getElementsByClassName("dropdown-menu");
+            
+            for (let i = 0; i < dropdowns.length; i++) {
+                const openDropdown = dropdowns[i];
+                
+                if (openDropdown.classList.contains('show')) {
+                    openDropdown.classList.remove('show');
+                }
+            }
+        }
+    });
     
     function autoResize(textarea) {
     textarea.style.height = 'auto';
@@ -255,11 +279,18 @@
         const dateVal = document.querySelector("#dateInput").value || "날짜 미선택";
         const brandVal = document.querySelector("#brandInput").value.trim() || "정보 없음";
         const generatedTitle = `[${chosenCategory}] ${chosenLocation}`;
+        let finalCategory = chosenCategory;
+        
+        if (chosenCategory === "기타") {
+            const customVal = document.querySelector("#customCategoryInput").value.trim();
+            finalCategory = customVal || "기타(미입력)";
+        }
+
 
         const combinedBody = `
         - 습득 위치: ${chosenLocation}
         - 습득 일시: ${dateVal}
-        - 물품 종류: ${chosenCategory}
+        - 물품 종류: ${finalCategory}
         - 물품 특징: ${chosenFeature}
         - 브랜드/제품명: ${brandVal}
 
@@ -354,13 +385,12 @@
         fromSource = urlParams.get('from');
         
         
-        if (fromSource === 'Found') {
-            습득();
-        } else if (fromSource === 'Lost') {
-            document.querySelector("#forLoster").style.display = 'block';
-            document.querySelector("#forFounder").style.display = 'none';
-            document.querySelector("#whatIsThisState").innerHTML = "분실 글쓰기";
-            // 분실();
+        if (fromSource === 'Lost') {
+            document.querySelector("#whatIsThisState").innerHTML = '분실 글쓰기';
+            
+            document.querySelector("#where").innerHTML = '어디에서 분실하셨나요?';
+            document.querySelector("#when").innerHTML = '언제 분실하셨나요?';
+            document.querySelector("#what").innerHTML = '어떤 물건을 분실하셨나요?';
         }
         else {
             console.log("fromSource는", `${fromSource}` + "임 멍청아");
@@ -368,15 +398,7 @@
         
         init();
     });
-    // 아니 자꾸 꼬이냐 이거
-    function 습득() {
-        console.log("굳이 함수를 하나 더 만들 필요가 있나 싶음.");
-    }
-    
-    function 분실() {
-        console.log("hello world");
-    }
-    
+
     </script>
 </body>
 </html>
