@@ -145,7 +145,7 @@
         </div>
     </div>
     
-    <input type="text" id="customInputLocation" placeholder="어디서 잃어버리셨나요?" style="display: none; margin-top: 8px; width: 100%;" />
+    <input type="text" id="customInputL" placeholder="어디서 잃어버리셨나요?" style="display: none; margin-top: 8px; width: 100%;" />
     <br />
 
     <!-- 2. 습득 날짜 (선택) -->
@@ -220,11 +220,11 @@
         document.querySelector("#locationBtn").innerText = val;
         document.querySelector("#locationDropdown").classList.remove("show");
         
-        const customInputL = document.querySelector("#customInputLocation");
+        const customInputL = document.querySelector("#customInputL");
         
         if (val === "기타") {
             customInputL.style.display = "block";
-            customInputLocationn.focus();
+            customInputL.focus();
         } else {
             customInputL.style.display = "none";
             customInputL.value = "";
@@ -278,17 +278,23 @@
         const fileInput = document.querySelector("#fileInput");
         const dateVal = document.querySelector("#dateInput").value || "날짜 미선택";
         const brandVal = document.querySelector("#brandInput").value.trim() || "정보 없음";
-        const generatedTitle = `[${chosenCategory}] ${chosenLocation}`;
+        const generatedTitle = `[${chosenCategory}] ${chosenLocation}`; // 이거 쓰는 변수맞냐
         let finalCategory = chosenCategory;
+        let finalLocation = chosenLocation
         
         if (chosenCategory === "기타") {
-            const customVal = document.querySelector("#customCategoryInput").value.trim();
+            let customVal = document.querySelector("#customCategoryInput").value.trim();
             finalCategory = customVal || "기타(미입력)";
         }
+        if (chosenLocation === "기타") {
+            let customVal = document.querySelector("#customInputL").value.trim();
+            finalLocation = customVal || "기타(미입력)";
+            
+        }
 
-
+        // 이거 분실로 바꿔야되지않냐
         const combinedBody = `
-        - 습득 위치: ${chosenLocation}
+        - 습득 위치: ${finalLocation}
         - 습득 일시: ${dateVal}
         - 물품 종류: ${finalCategory}
         - 물품 특징: ${chosenFeature}
