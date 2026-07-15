@@ -1,1 +1,167 @@
-/*나중에 디자인하는 것들은 여기에 넣을거임*/
+.segmented-control {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    background-color: #f1f5f9; /* 연한 회색 배경 */
+    padding: 4px;
+    border-radius: 30px;
+    width: 200px;
+    height: 40px;
+    box-sizing: border-box;
+}
+
+.segmented-control input[type="radio"] {
+    display: none; /* 실제 라디오 버튼은 숨김 */
+}
+
+.tab-item {
+    flex: 1;
+    z-index: 2;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 600;
+    color: #64748b;
+    cursor: pointer;
+    line-height: 32px;
+    transition: color 0.25s ease;
+}
+
+/* 움직이는 배경 블록(글라이더) */
+.glider {
+    position: absolute;
+    left: 4px;
+    top: 4px;
+    width: 94px; /* (200px - 패딩8px) / 2 */
+    height: 32px;
+    border-radius: 26px;
+    background-color: #ffffff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 1;
+}
+
+/* 라디오 버튼 선택 시 글라이더 이동 및 글자 색상 변경 */
+#tab-found:checked ~ .glider {
+    transform: translateX(0);
+}
+
+#tab-lost:checked ~ .glider {
+    transform: translateX(98px);
+}
+
+/* 활성화된 탭에 컬러 포인트 주기 */
+#tab-found:checked ~ .found-tab {
+    color: var(--primary-color); /* 습득은 초록 */
+}
+
+#tab-lost:checked ~ .lost-tab {
+    color: var(--secondary-color); /* 분실은 파랑 */
+}
+
+        .menu-container {
+            position: relative;
+            display: inline-block;
+            float: right;
+        }
+        .dots-btn {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+        }
+        .dropdown-menu { 
+            display: none;
+            position: absolute;
+            right: 0;
+            background: white;
+            border: 1px solid #ccc;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            z-index: 1;
+        }
+        .dropdown-menu button {
+            white-space: nowrap;
+            display: block; 
+            width: 100%; 
+            padding: 10px 20px; 
+            border: none; 
+            background: none; 
+            cursor: pointer; 
+            text-align: left;
+        }
+        .dropdown-menu button:hover {
+            background: #f5f5f5;
+        }
+        .show {
+            display: block;
+        }
+        
+
+        #postImage {
+            max-width: 100%;
+            height: auto;
+            margin-top: 15px;
+            display: none;
+        }
+        
+        .form-container {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .form-group {
+            margin-bottom: 24px;
+            display: flex;
+            flex-direction: column;
+        }
+        .form-label {
+            font-weight: bold;
+            font-size: 15px;
+            margin-bottom: 8px;
+            color: #333;
+        }
+        .sub-label {
+            font-size: 12px;
+            font-weight: normal;
+            color: #666;
+        }
+        .dots-btn, .form-input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            background-color: #fff;
+            text-align: left;
+            font-size: 14px;
+            box-sizing: border-box;
+            cursor: pointer;
+        }
+        .form-input:focus {
+            outline: none;
+            border-color: #007bff;
+        }
+        .menu-container {
+            position: relative;
+        }
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            width: 100%;
+            z-index: 10;
+            background: white;
+            border: 1px solid #ddd;
+            box-shadow: 0px 4px 6px rgba(0,0,0,0.1);
+        }
+        .dropdown-menu.show {
+            display: block;
+        }
+        .dropdown-menu button {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            background: none;
+            text-align: left;
+            cursor: pointer;
+        }
+        .dropdown-menu button:hover {
+            background-color: #f5f5f5;
+        }

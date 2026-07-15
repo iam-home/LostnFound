@@ -61,8 +61,16 @@ Lost -> 분실
         </div>
     
 
-        <button onclick="changeType('Found')">습득</button>
-        <button onclick="changeType('Lost')">분실</button>
+        <div class="segmented-control">
+            <input type="radio" id="tab-found" name="type-tab" checked onclick="changeType('Found')">
+            <label for="tab-found" class="tab-item found-tab">습득물</label>
+        
+            <input type="radio" id="tab-lost" name="type-tab" onclick="changeType('Lost')">
+            <label for="tab-lost" class="tab-item lost-tab">분실물</label>
+            
+            <div class="glider"></div>
+        </div>
+
 
         <div class="search-container" style="position: relative; display: inline-block;">
             <input type="text" id="searchKeyword" placeholder="검색어 입력" onkeyup="if(window.event.keyCode==13){searchPosts()}">
