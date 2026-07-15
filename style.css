@@ -1,1 +1,553 @@
-/*나중에 디자인하는 것들은 여기에 넣을거임*/
+/* ============================================================
+   Lost & Found - 공통 스타일
+   초록(primary) + 파랑(accent) 계열 팔레트
+   ============================================================ */
+
+:root {
+    --green-900: #14432b;
+    --green-700: #1f6640;
+    --green-600: #2d7a4f;   /* 메인 초록 (로고와 동일) */
+    --green-500: #38946a;
+    --green-100: #e3f3ea;
+    --green-50:  #f2f9f5;
+
+    --blue-700: #145a9e;
+    --blue-600: #1f77c7;
+    --blue-500: #2f92e0;
+    --blue-100: #e4f1fb;
+    --blue-50:  #f1f8fe;
+
+    --text:       #1f2b25;
+    --text-muted: #5f7168;
+    --border:     #d5e4db;
+    --bg:         #f4f8f6;
+    --card-bg:    #ffffff;
+
+    --danger: #d9534f;
+    --radius: 10px;
+    --shadow-sm: 0 1px 3px rgba(20, 67, 43, 0.08);
+    --shadow-md: 0 6px 18px rgba(20, 67, 43, 0.10);
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html {
+    background-color: var(--bg);
+}
+
+body {
+    margin: 0;
+    padding: 24px 16px 64px;
+    max-width: 720px;
+    margin-left: auto;
+    margin-right: auto;
+    font-family: "Pretendard", "Apple SD Gothic Neo", "Malgun Gothic",
+        system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    color: var(--text);
+    background-color: var(--bg);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* ---------- 로고 ---------- */
+/* index / detail 상단 로고 wrapper (inline width 24px div) */
+body > div[onclick],
+div[onclick*="index.html"],
+div[onclick*="loadPosts"] {
+    color: var(--green-600);
+    cursor: pointer;
+    transition: transform 0.15s ease;
+}
+div[onclick*="index.html"]:hover,
+div[onclick*="loadPosts"]:hover {
+    transform: scale(1.08);
+}
+
+/* ============================================================
+   버튼 (공통)
+   드롭다운/메뉴 버튼은 각 페이지 <style>에서 재정의되므로 영향 없음
+   ============================================================ */
+button {
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    color: #fff;
+    background-color: var(--green-600);
+    border: none;
+    border-radius: var(--radius);
+    padding: 9px 16px;
+    cursor: pointer;
+    transition: background-color 0.15s ease, transform 0.05s ease,
+        box-shadow 0.15s ease;
+}
+button:hover {
+    background-color: var(--green-700);
+}
+button:active {
+    transform: translateY(1px);
+}
+button:focus-visible {
+    outline: 3px solid var(--green-100);
+    outline-offset: 1px;
+}
+
+/* ============================================================
+   index.html - 홈 / 목록
+   ============================================================ */
+#display > div:first-of-type {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding-bottom: 16px;
+    margin-bottom: 20px;
+    border-bottom: 2px solid var(--green-100);
+}
+
+/* 습득 / 분실 탭 버튼 (첫 두 버튼) */
+#display > div:first-of-type > button {
+    background-color: #fff;
+    color: var(--green-700);
+    border: 1.5px solid var(--green-500);
+}
+#display > div:first-of-type > button:hover {
+    background-color: var(--green-50);
+}
+
+/* 검색 영역 */
+.search-container {
+    margin-left: auto;
+    display: inline-flex !important;
+    align-items: center;
+    gap: 6px;
+}
+#searchKeyword {
+    font-family: inherit;
+    font-size: 14px;
+    padding: 8px 12px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    background: #fff;
+    color: var(--text);
+    min-width: 160px;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+#searchKeyword:focus {
+    outline: none;
+    border-color: var(--blue-500);
+    box-shadow: 0 0 0 3px var(--blue-100);
+}
+#clearSearchBtn {
+    color: var(--text-muted) !important;
+    font-weight: 700;
+    z-index: 2;
+    padding: 0 !important;
+}
+.search-container > button:last-child {
+    background-color: var(--blue-600);
+}
+.search-container > button:last-child:hover {
+    background-color: var(--blue-700);
+}
+
+/* 글쓰기 버튼 */
+#display > button {
+    display: block;
+    width: 100%;
+    margin-top: 24px;
+    padding: 14px;
+    font-size: 15px;
+    box-shadow: var(--shadow-sm);
+}
+
+/* 게시글 목록 컨테이너 */
+#body {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    min-height: 120px;
+}
+#body > div:only-child,
+#body > p {
+    text-align: center;
+    color: var(--text-muted);
+    padding: 48px 12px;
+    background: var(--card-bg);
+    border: 1px dashed var(--border);
+    border-radius: var(--radius);
+}
+
+/* 기본 카드 (제목만 표시) */
+.post-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--green-500);
+    border-radius: var(--radius);
+    padding: 4px 18px;
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.12s ease, box-shadow 0.15s ease,
+        border-color 0.15s ease;
+}
+.post-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+    border-left-color: var(--green-600);
+}
+.post-card h3 {
+    margin: 14px 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text);
+}
+
+/* 검색 결과 아이템 */
+.post-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 18px;
+    cursor: pointer;
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.12s ease, box-shadow 0.15s ease;
+}
+.post-item:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+.post-title {
+    flex: 1;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text);
+}
+.post-date {
+    font-size: 12px;
+    color: var(--text-muted);
+    white-space: nowrap;
+}
+
+/* 습득/분실 뱃지 */
+.badge {
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 999px;
+    white-space: nowrap;
+}
+.badge.Found {
+    background-color: var(--green-100);
+    color: var(--green-700);
+}
+.badge.Lost {
+    background-color: var(--blue-100);
+    color: var(--blue-700);
+}
+
+/* ============================================================
+   detail.html - 상세 페이지
+   ============================================================ */
+#postDetail {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+    margin-top: 16px;
+    box-shadow: var(--shadow-sm);
+}
+#postTitle {
+    margin: 0 0 12px;
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--green-900);
+    line-height: 1.35;
+}
+#postDetail hr {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 16px 0;
+}
+#postBody {
+    white-space: pre-wrap;
+    font-size: 15px;
+    color: var(--text);
+    line-height: 1.7;
+}
+#postImage {
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+}
+
+/* 목록으로 버튼 */
+button[onclick*="goBack"] {
+    background-color: #fff;
+    color: var(--green-700);
+    border: 1.5px solid var(--green-500);
+    margin-bottom: 8px;
+}
+button[onclick*="goBack"]:hover {
+    background-color: var(--green-50);
+}
+
+/* 삭제하기 (drop-down 내 빨간 글자) */
+.dropdown-menu button[style*="red"],
+.dropdown-menu button[onclick*="deletePost"] {
+    color: var(--danger) !important;
+}
+
+/* 댓글 섹션 */
+.comments-section h3 {
+    font-size: 17px;
+    color: var(--green-800, var(--green-700));
+    margin-bottom: 16px;
+}
+#newCommentInput:focus {
+    outline: none;
+    border-color: var(--blue-500) !important;
+    box-shadow: 0 0 0 3px var(--blue-100);
+}
+/* 댓글 등록 버튼 (inline 파란색 -> 팔레트 파랑 유지) */
+.comment-input-box button {
+    background-color: var(--blue-600) !important;
+}
+.comment-input-box button:hover {
+    background-color: var(--blue-700) !important;
+}
+.author-badge {
+    background-color: var(--green-100) !important;
+    color: var(--green-700) !important;
+}
+
+/* ============================================================
+   write.html / edit.html - 작성 & 수정 폼
+   ============================================================ */
+header {
+    display: block;
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 2px solid var(--green-100);
+}
+header > div {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+header button {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+header button svg {
+    width: 18px;
+    height: 18px;
+}
+/* 취소 버튼 (뒤로가기) */
+header button:first-child,
+button[onclick="goBack();"] {
+    background-color: #fff;
+    color: var(--green-700);
+    border: 1.5px solid var(--green-500);
+}
+header button:first-child:hover,
+button[onclick="goBack();"]:hover {
+    background-color: var(--green-50);
+}
+#whatIsThisState {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--green-900);
+}
+
+/* 제목 / 본문 textarea */
+#title,
+#body {
+    display: block;
+    width: 100%;
+    font-family: inherit;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    background: #fff;
+    color: var(--text);
+    padding: 14px 16px;
+    margin-bottom: 12px;
+    resize: none;
+    overflow: hidden;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+#title {
+    font-size: 18px;
+    font-weight: 700;
+    min-height: 52px;
+}
+#body {
+    font-size: 15px;
+    min-height: 140px;
+    line-height: 1.6;
+}
+#title:focus,
+#body:focus {
+    outline: none;
+    border-color: var(--green-500);
+    box-shadow: 0 0 0 3px var(--green-100);
+}
+
+/* 폼 컨테이너 (write.html) */
+.form-container {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    box-shadow: var(--shadow-sm);
+}
+.form-label {
+    color: var(--green-900) !important;
+}
+.sub-label {
+    color: var(--text-muted) !important;
+}
+
+/* 선택 버튼 / 인풋 (form-input, dots-btn) - focus 색상만 초록으로 통일 */
+.form-input:focus,
+.sub-select:focus {
+    outline: none;
+    border-color: var(--green-500) !important;
+    box-shadow: 0 0 0 3px var(--green-100);
+}
+.dots-btn:hover {
+    border-color: var(--green-500);
+}
+.sub-select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 14px;
+    background: #fff;
+    color: var(--text);
+    margin-bottom: 8px;
+}
+.sub-input-group {
+    margin-top: 8px;
+}
+
+/* 위치/카테고리 커스텀 인풋 & 날짜/특징/브랜드 인풋 */
+input[type="text"],
+input[type="date"] {
+    font-family: inherit;
+    font-size: 14px;
+    color: var(--text);
+}
+#customCategoryInput,
+#customInputLocationocation {
+    padding: 12px;
+    border: 1.5px solid var(--border);
+    border-radius: 6px;
+    background: #fff;
+}
+#customCategoryInput:focus,
+#customInputLocationocation:focus {
+    outline: none;
+    border-color: var(--green-500);
+    box-shadow: 0 0 0 3px var(--green-100);
+}
+
+/* 드롭다운 선택된 항목 hover (write 페이지 메뉴) */
+.dropdown-menu button:hover {
+    background-color: var(--green-50) !important;
+    color: var(--green-700);
+}
+
+/* 파일 첨부 */
+#fileInput {
+    display: block;
+    width: 100%;
+    margin: 16px 0 4px;
+    padding: 10px;
+    border: 1.5px dashed var(--border);
+    border-radius: var(--radius);
+    background: var(--green-50);
+    font-size: 13px;
+    color: var(--text-muted);
+    cursor: pointer;
+}
+#fileInput::file-selector-button {
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    color: #fff;
+    background: var(--green-600);
+    border: none;
+    border-radius: 6px;
+    padding: 8px 14px;
+    margin-right: 12px;
+    cursor: pointer;
+}
+#fileInput::file-selector-button:hover {
+    background: var(--green-700);
+}
+h5 {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-muted);
+    margin: 8px 0 0;
+}
+#preview img {
+    max-width: 100%;
+    height: auto;
+    border-radius: var(--radius);
+    margin-top: 12px;
+    border: 1px solid var(--border);
+}
+
+/* edit.html 이미지 영역 */
+#imageArea {
+    margin: 8px 0;
+}
+#imageArea img {
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+}
+#deleteImgBtn {
+    margin-top: 8px;
+    background-color: #fff;
+    color: var(--danger);
+    border: 1.5px solid var(--danger);
+}
+#deleteImgBtn:hover {
+    background-color: #fff0ef;
+}
+
+/* 수정/등록 완료 버튼 (edit.html 마지막 버튼) */
+button[onclick="EDIT();"] {
+    display: block;
+    width: 100%;
+    margin-top: 20px;
+    padding: 14px;
+    font-size: 15px;
+    box-shadow: var(--shadow-sm);
+}
+
+/* ---------- 반응형 ---------- */
+@media (max-width: 560px) {
+    body {
+        padding: 16px 12px 48px;
+    }
+    .search-container {
+        margin-left: 0;
+        width: 100%;
+    }
+    #searchKeyword {
+        flex: 1;
+        min-width: 0;
+    }
+    #postTitle {
+        font-size: 20px;
+    }
+}
