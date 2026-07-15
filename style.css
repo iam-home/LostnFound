@@ -458,10 +458,22 @@ input[type="date"] {
     box-shadow: 0 0 0 3px var(--green-100);
 }
 
+/* 선택 토글 버튼 (dots-btn) - 전역 button 흰색 글자 덮어쓰기 */
+.dots-btn {
+    color: var(--text) !important;
+    font-weight: 500 !important;
+}
+
+/* 드롭다운 항목 버튼 - 전역 button 흰색 글자 때문에 안 보이던 것 수정 */
+.dropdown-menu button {
+    color: var(--text) !important;
+    font-weight: 500 !important;
+}
+
 /* 드롭다운 선택된 항목 hover (write 페이지 메뉴) */
 .dropdown-menu button:hover {
     background-color: var(--green-50) !important;
-    color: var(--green-700);
+    color: var(--green-700) !important;
 }
 
 /* 파일 첨부 */
