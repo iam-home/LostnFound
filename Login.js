@@ -1,7 +1,6 @@
-const supabaseUrl = 'SCRET_REMOVED';
-const supabaseKey = 'SCRET_REMOVED';
+import { CONFIG } from './config.js';
 
-const client = supabase.createClient(supabaseUrl, supabaseKey);
+const client = supabase.createClient(CONFIG.supabaseUrl, CONFIG.supabaseKey);
 
 async function checkLogin() {
   try {
@@ -53,23 +52,3 @@ async function signInWithGoogle() {
 // // function signInWithKakao() {}
 // // function signInWithPhoneNumber() {}
 // // function signInWithApple() {}
-
-
-
-// 테스트용 이메일 로그인
-async function dever() {
-  try {
-    const { data, error } = await client.auth.signInWithPassword({
-    email: 'test@gmail.com',
-    password: 'uiopui'
-  });
-  if (error) {
-    console.error(error);
-    return false;
-  }
-  return true;
-  } catch (e) {
-    console.error(e);
-    return false;
-  }
-}
