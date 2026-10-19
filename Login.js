@@ -1,6 +1,7 @@
-import { CONFIG } from './config.js';
+const supabaseUrl = 'https://nrtgszcxonrhnnjcvltj.supabase.co';
+const supabaseKey = 'SCRET_REMOVED';
 
-const client = supabase.createClient(CONFIG.supabaseUrl, CONFIG.supabaseKey);
+const client = supabase.createClient(supabaseUrl, supabaseKey);
 
 async function checkLogin() {
   try {
