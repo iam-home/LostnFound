@@ -1,5 +1,5 @@
 const supabaseUrl = 'https://nrtgszcxonrhnnjcvltj.supabase.co';
-const supabaseKey = 'SCRET_REMOVED';
+const supabaseKey = 'sb_publishable_VvUL_f5uqAdORJpFv4U50w_b_d3g7cb';
 
 const client = supabase.createClient(supabaseUrl, supabaseKey);
 
